@@ -45,6 +45,10 @@ Vagrant.configure(2) do |config|
     sudo pip install -r requirements.txt
     # Make vi look nice
     echo "colorscheme desert" > ~/.vimrc
+    echo "export FLASK_APP=/vagrant/shopcart.py" >> /home/vagrant/.bashrc
+    echo "alias start_flask='flask run --host=0.0.0.0 --port=8888'" >> /home/vagrant/.bash_aliases
   SHELL
+
+
 
 end
