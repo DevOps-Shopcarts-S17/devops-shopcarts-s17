@@ -41,13 +41,13 @@ shopping_carts = [
                 'sku': 123456780,
                 'quantity': 2,
                 'name': "Settlers of Catan",
-                'price': 27.99,
+                'unitprice': 27.99,
             },
             {
                 'sku': 876543210,
                 'quantity': 1,
                 'name': "Risk",
-                'price': 27.99,
+                'unitprice': 27.99,
             }
         ]
     },
@@ -57,14 +57,14 @@ shopping_carts = [
         'products': []
     },
     {
-        'uid':2,
-        'sid':  2,
+        'uid': 3,
+        'sid': 3,
         'products': [
             {
                 'sku': 011467250,
                 'quantity': 1,
                 'name': "Game of Life",
-                'price': 13.99,
+                'unitprice': 13.99,
             }
         ]
     },
