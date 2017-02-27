@@ -30,6 +30,47 @@ HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
 
 ######################################################################
+# Data Store, pre-populated with sample data
+######################################################################
+shopping_carts = [
+    {
+        'uid':1,
+        'sid':  1,
+        'products': [
+            {
+                'sku': 123456780,
+                'quantity': 2,
+                'name': "Settlers of Catan",
+                'unitprice': 27.99,
+            },
+            {
+                'sku': 876543210,
+                'quantity': 1,
+                'name': "Risk",
+                'unitprice': 27.99,
+            }
+        ]
+    },
+    {
+        'uid':2,
+        'sid':  2,
+        'products': []
+    },
+    {
+        'uid': 3,
+        'sid': 3,
+        'products': [
+            {
+                'sku': 011467250,
+                'quantity': 1,
+                'name': "Game of Life",
+                'unitprice': 13.99,
+            }
+        ]
+    },
+]
+
+######################################################################
 # GET INDEX
 ######################################################################
 @app.route('/')
