@@ -61,7 +61,7 @@ shopping_carts = [
         'sid': 3,
         'products': [
             {
-                'sku': 011467250,
+                'sku': 114672050,
                 'quantity': 1,
                 'name': "Game of Life",
                 'unitprice': 13.99,
