@@ -237,6 +237,14 @@ def create_products(sid):
         return make_response(jsonify(message), rc)
 
 ######################################################################
+# DELETE A SHOPPING CART
+######################################################################
+@app.route('/shopcarts/<int:sid>', methods=['DELETE'])
+def delete_shopcarts(sid):
+    del shopping_carts[sid]
+    return '', HTTP_204_NO_CONTENT
+    
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def next_sid():
