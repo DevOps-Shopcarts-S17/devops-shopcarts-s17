@@ -84,7 +84,7 @@ def index():
 ######################################################################
 # LIST ALL SHOPCARTS FOR ALL USERS
 ######################################################################
-#USAGE: /shopcarts or #USAGE: /shopcarts?sid=1
+#USAGE: /shopcarts or /shopcarts?sid=1 for quering for a user
 @app.route('/shopcarts', methods=['GET'])
 def list_shopcarts():
     results=[]
@@ -111,7 +111,7 @@ def list_shopcarts():
     return make_response(jsonify(results), HTTP_200_OK)
 
 ######################################################################
-# RETRIEVE USER'S PRODUCTS IN THE CART
+# RETRIEVE A USER'S CART
 ######################################################################
 #USAGE: /shopcarts/3
 @app.route('/shopcarts/<int:sid>', methods=['GET'])
@@ -129,9 +129,9 @@ def get_shopcart(sid):
     return make_response(jsonify(message), rc)
 
 ######################################################################
-# RETRIEVE USER'S PRODUCTS IN THE CART
+# RETRIEVE USER'S PRODUCTS LIST IN THE CART
 ######################################################################
-#USAGE: /shopcarts/3/products or /shopcarts/3/products?sku=114672050
+#USAGE: /shopcarts/3/products or /shopcarts/3/products?sku=114672050 for querying for a product
 @app.route('/shopcarts/<int:sid>/products', methods=['GET'])
 def get_products(sid):
     carts = [cart for cart in shopping_carts if cart['sid']==sid]
