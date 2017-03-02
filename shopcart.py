@@ -215,10 +215,10 @@ def create_shopcarts():
 @app.route('/shopcarts/<int:sid>/products', methods=['POST'])
 def create_products(sid):
     cart = [cart for cart in shopping_carts if cart['sid']==sid]
-    if len(cart) > 0:  
+    if len(cart) > 0:
         payload = request.get_json()
         if is_validProduct(payload):
-            for i in range(0,len(payload['products'])): 
+            for i in range(0,len(payload['products'])):
                 product = {'sku': payload['products'][i]['sku'],'quantity': payload['products'][i]['quantity'], 'name': payload['products'][i]['name'], 'unitprice' : payload['products'][i]['unitprice']}
                 cart[0]['products'].append(product)
             message = cart[0]
@@ -236,6 +236,50 @@ def create_products(sid):
         rc = HTTP_404_NOT_FOUND
         return make_response(jsonify(message), rc)
 
+
+######################################################################
+# UPDATE product in a shopping cart
+######################################################################
+@app.route('/shopcarts/<int:sid>/products/<int:sku>', methods=['PUT'])
+def put_product(sid, sku):
+    cart = [cart for cart in shopping_carts if cart['sid'] == sid]
+    if len(cart) > 0:
+        payload = request.get_json()
+        products = payload['products']
+
+        if is_validProduct(payload) and len(products) == 1:
+            updated_product = {'sku': products[0]['sku'], 'quantity': products[0]['quantity'], 'name': products[0]['name'], 'unitprice': products[0]['unitprice']}
+            print(updated_product)
+
+            found_product = False
+            for i in range(len(cart[0]['products'])):
+                product = cart[0]['products'][i]
+                if product['sku'] == sku:
+                    cart[0]['products'][i] = updated_product
+                    found_product = True
+                    break
+
+            if found_product:
+                message = cart[0]
+                rc = HTTP_200_OK
+            else:
+                message = { 'error' : 'Product %s was not found in shopping cart %s' % (str(sku), str(sid)) }
+                rc = HTTP_404_NOT_FOUND
+        else:
+            message = { 'error' : 'Product data is not valid' }
+            rc = HTTP_400_BAD_REQUEST
+
+        response = make_response(jsonify(message), rc)
+
+        if rc == HTTP_201_CREATED:
+            response.headers['Location'] = url_for('put_product', sku = payload['sku'], sid=shopping_carts[cart[0].sid])
+        return response
+
+    else:
+        message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
+        rc = HTTP_404_NOT_FOUND
+        return make_response(jsonify(message), rc)
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
@@ -248,7 +292,7 @@ def next_sid():
 def is_validProduct(data):
     valid = False
     try:
-        for i in range(0,len(data['products'])):  
+        for i in range(0,len(data['products'])):
             sku = data['products'][i]['sku']
             quantity = data['products'][i]['quantity']
             name = data['products'][i]['name']
