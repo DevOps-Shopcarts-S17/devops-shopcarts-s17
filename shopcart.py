@@ -244,7 +244,8 @@ def delete_shopcarts(sid):
     for i in range(len(shopping_carts)):
     	if shopping_carts[i]['sid'] == sid:
     	    del shopping_carts[i]
-    	    return '', HTTP_204_NO_CONTENT
+    	    break
+    return '', HTTP_204_NO_CONTENT
     
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
