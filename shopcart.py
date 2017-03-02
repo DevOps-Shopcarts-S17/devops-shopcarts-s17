@@ -241,8 +241,10 @@ def create_products(sid):
 ######################################################################
 @app.route('/shopcarts/<int:sid>', methods=['DELETE'])
 def delete_shopcarts(sid):
-    del shopping_carts[sid]
-    return '', HTTP_204_NO_CONTENT
+    for i in range(len(shopping_carts)):
+    	if shopping_carts[i]['sid'] == sid:
+    	    del shopping_carts[i]
+    	    return '', HTTP_204_NO_CONTENT
     
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
