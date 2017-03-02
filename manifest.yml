@@ -7,4 +7,3 @@ applications:
   host: nyu-shopcarts-service
   disk_quota: 1024M
   buildpack: python_buildpack
-  services:
