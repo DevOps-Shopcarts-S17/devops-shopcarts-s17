@@ -292,6 +292,18 @@ def delete_shopcarts(sid):
     return '', HTTP_204_NO_CONTENT
 
 ######################################################################
+# DELETE A PRODUCT FROM A SHOPPING CART
+######################################################################
+@app.route('/shopcarts/<int:sid>/products/<int:sku>', methods=['DELETE'])
+def delete_products(sid,sku):
+    for i in range(len(shopping_carts)):
+    	if shopping_carts[i]['sid'] == sid:
+    	    for j in range(len(shopping_carts[i]['products'])):
+    	    	if shopping_carts[i]['products'][j]['sku'] == sku:
+    	    		del shopping_carts[i]['products'][j]
+    	    		return '', HTTP_204_NO_CONTENT
+    
+######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
 def next_sid():
