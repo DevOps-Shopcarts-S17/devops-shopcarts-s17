@@ -81,7 +81,7 @@ current_shopping_cart_id = 4
 @app.route('/')
 def index():
     shopcarts_url = request.base_url + "shopcarts"
-    return make_response(jsonify(name='Shopcart Demo REST API Service',
+    return make_response(jsonify(name='Shopcart Demo REST API Service v1.0',
                    version='1.0',
                    url=shopcarts_url
                    ), HTTP_200_OK)
@@ -290,7 +290,7 @@ def delete_shopcarts(sid):
     	    del shopping_carts[i]
     	    break
     return '', HTTP_204_NO_CONTENT
-    
+
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
