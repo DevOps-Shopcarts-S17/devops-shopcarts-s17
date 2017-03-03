@@ -192,7 +192,7 @@ def get_product(sid,sku):
 @app.route('/shopcarts', methods=['POST'])
 def create_shopcarts():
     payload = request.get_json()
-    if is_validShoppingCart(payload):
+    if is_valid_shopping_cart(payload):
         id = next_sid()
         if 'products' not in payload:
             payload['products'] = []
@@ -217,7 +217,7 @@ def create_products(sid):
     cart = [cart for cart in shopping_carts if cart['sid']==sid]
     if len(cart) > 0:
         payload = request.get_json()
-        if is_validProduct(payload):
+        if is_valid_product(payload):
             for i in range(0,len(payload['products'])):
                 product = {'sku': payload['products'][i]['sku'],'quantity': payload['products'][i]['quantity'], 'name': payload['products'][i]['name'], 'unitprice' : payload['products'][i]['unitprice']}
                 cart[0]['products'].append(product)
@@ -247,7 +247,7 @@ def put_product(sid, sku):
         payload = request.get_json()
         products = payload['products']
 
-        if is_validProduct(payload) and len(products) == 1:
+        if is_valid_product(payload) and len(products) == 1:
             updated_product = {'sku': products[0]['sku'], 'quantity': products[0]['quantity'], 'name': products[0]['name'], 'unitprice': products[0]['unitprice']}
             print(updated_product)
 
@@ -313,7 +313,7 @@ def next_sid():
         current_shopping_cart_id += 1
     return current_shopping_cart_id
 
-def is_validProduct(data):
+def is_valid_product(data):
     valid = False
     try:
         for i in range(0,len(data['products'])):
@@ -329,7 +329,7 @@ def is_validProduct(data):
 
     return valid
 
-def is_validShoppingCart(data):
+def is_valid_shopping_cart(data):
     valid = False
     try:
         user_id = data['uid']
