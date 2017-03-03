@@ -281,10 +281,10 @@ def put_product(sid, sku):
         return make_response(jsonify(message), rc)
 
 ######################################################################
-# DELETE A SHOPPING CART
+# DELETE A PRODUCT FROM A SHOPPING CART
 ######################################################################
-@app.route('/shopcarts/<int:sid>', methods=['DELETE'])
-def delete_shopcarts(sid):
+@app.route('/shopcarts/<int:sid>/products/<int:sku>', methods=['DELETE'])
+def delete_products(sid,sku):
     for i in range(len(shopping_carts)):
     	if shopping_carts[i]['sid'] == sid:
     	    del shopping_carts[i]
