@@ -1,13 +1,9 @@
-customerId,productId,productName,productQuantity,productPrice
-1001,2012,"iPhone 7 Plus",1900,2
-1002,2011,"Canon 6D DSLR",1000,1
-1003,2010,"Hugo Boss Wallet",56,3
-1004,2009,"Canada Goose Jacket",900,2
-1005,2008,"Roscatto Wine",12,23
-1006,2007,"Spa Sensation Mattress",150,6
-1007,2006,"Bathroom Curtain",1.99,1
-1008,2005,"Oven Tray",4.99,11
-1009,2004,"Columbia Boots",90,1
-1010,2003,"Fila Running Shoes",20,4
-1011,2002,"5 piece bedroom set",42,3
-1012,2001,"Macbook Pro",1700,1
+uid,sid,products__sku,products__quantity,products__name,products__unitprice
+1,1,123456780,2,"Settlers of Catan",27.99
+1,1,876543210,1,"Risk",27.99
+2,2,,,
+3,3,114672050,1,"Game of Life",13.99
+3,3,218672050,12,"Taboo",1.99
+4,4,344672050,14,"Uno",4.99
+5,5,44982050,2,"Scattegories",8.99
+6,6,786674050,1,"Game of Thrones",53.99

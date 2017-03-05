@@ -70,7 +70,7 @@ shopping_carts = [
                 'unitprice': 13.99
             }
         ]
-    },
+    }
 ]
 
 current_shopping_cart_id = 4
