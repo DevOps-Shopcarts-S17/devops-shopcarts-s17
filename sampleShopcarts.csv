@@ -1,7 +1,7 @@
 uid,sid,products_sku,products_quantity,products_name,products_unitprice
 1,1,123456780,2,"Settlers of Catan",27.99
 1,1,876543210,1,"Risk",27.99
-2,2,,,
+2,2,,,,
 3,3,114672050,1,"Game of Life",13.99
 3,3,218672050,12,"Taboo",1.99
 4,4,344672050,14,"Uno",4.99
