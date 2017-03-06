@@ -1,4 +1,4 @@
-uid,sid,products__sku,products__quantity,products__name,products__unitprice
+uid,sid,products_sku,products_quantity,products_name,products_unitprice
 1,1,123456780,2,"Settlers of Catan",27.99
 1,1,876543210,1,"Risk",27.99
 2,2,,,
