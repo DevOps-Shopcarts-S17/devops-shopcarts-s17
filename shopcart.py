@@ -39,6 +39,7 @@ shopping_carts = [
     {
         'uid':1,
         'sid':  1,
+        'subtotal': 0.00,
         'products': [
             {
                 'sku': 123456780,
@@ -57,11 +58,13 @@ shopping_carts = [
     {
         'uid':2,
         'sid':  2,
+        'subtotal': 0.00,
         'products': []
     },
     {
         'uid': 3,
         'sid': 3,
+        'subtotal': 0.00,
         'products': [
             {
                 'sku': 114672050,
@@ -196,7 +199,7 @@ def create_shopcarts():
         id = next_sid()
         if 'products' not in payload:
             payload['products'] = []
-        shopcart = {'uid': payload['uid'],'sid': id, 'products': payload['products']}
+        shopcart = {'uid': payload['uid'],'sid': id, 'products': payload['products'], 'subtotal': 0.0}
         shopping_carts.append(shopcart)
         message = shopcart
         rc = HTTP_201_CREATED
@@ -228,9 +231,11 @@ def create_products(sid):
             rc = HTTP_400_BAD_REQUEST
 
         response = make_response(jsonify(message), rc)
+
         if rc == HTTP_201_CREATED:
-            response.headers['Location'] = url_for('get_product', sku = payload['sku'], sid=shopping_carts[cart[0].sid])
+            response.headers['Location'] = url_for('get_product', sku = product['sku'], sid=cart[0]['sid'])
         return response
+
     else:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
         rc = HTTP_404_NOT_FOUND
@@ -271,10 +276,6 @@ def put_product(sid, sku):
 
         response = make_response(jsonify(message), rc)
 
-        if rc == HTTP_201_CREATED:
-            response.headers['Location'] = url_for('put_product', sku = payload['sku'], sid=shopping_carts[cart[0].sid])
-        return response
-
     else:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
         rc = HTTP_404_NOT_FOUND
@@ -303,6 +304,28 @@ def delete_products(sid,sku):
     	    		del shopping_carts[i]['products'][j]
     	    		break
     return '', HTTP_204_NO_CONTENT
+
+######################################################################
+# ACTION SUBTOTAL OF SHOPPING CART
+######################################################################
+@app.route('/shopcarts/<int:sid>/subtotal', methods=['PUT'])
+def subtotal_shopcart(sid):
+    for i in range(len(shopping_carts)):
+        if shopping_carts[i]['sid'] == sid:
+            subtotal = 0.0
+
+            for product in shopping_carts[i]['products']:
+                subtotal += product['unitprice'] * product['quantity']
+            shopping_carts[i]['subtotal'] = float("{0:.2f}".format(subtotal))
+            message = shopping_carts[i]
+            rc = HTTP_200_OK
+            break
+
+    if not 'rc' in locals():
+        message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
+        rc = HTTP_404_NOT_FOUND
+
+    return make_response(jsonify(message), rc)
 
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
