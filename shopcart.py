@@ -83,7 +83,7 @@ current_shopping_cart_id = 4
 ######################################################################
 @app.route('/')
 def index():
-    shopcarts_url = request.base_url + "shopcarts"
+    shopcarts_url = request.base_url + 'shopcarts'
     return make_response(jsonify(name='Shopcart Demo REST API Service v1.0',
                    version='1.0',
                    url=shopcarts_url
@@ -92,7 +92,7 @@ def index():
 ######################################################################
 # LIST ALL SHOPCARTS FOR ALL USERS
 ######################################################################
-#USAGE: /shopcarts or /shopcarts?sid=1 for quering for a user
+# USAGE: /shopcarts or /shopcarts?sid=1 for quering for a user
 @app.route('/shopcarts', methods=['GET'])
 def list_shopcarts():
     results=[]
@@ -105,14 +105,10 @@ def list_shopcarts():
             return make_response(jsonify(shopping_carts), HTTP_200_OK)
 
         results=[cart for cart in shopping_carts if cart['sid']==int(sid)]
-        if len(results)==0:
-            results=shopping_carts
+        if len(results)!=0:
+            results=shopping_carts[0]
         else:
-
-            if len(results[0]['products'])==0:
-                results='The cart contains no products'
-            else:
-                results=results[0]['products']
+            results=shopping_carts
     else:
         results=shopping_carts
 
@@ -121,14 +117,12 @@ def list_shopcarts():
 ######################################################################
 # RETRIEVE A USER'S CART
 ######################################################################
-#USAGE: /shopcarts/3
+# USAGE: /shopcarts/3
 @app.route('/shopcarts/<int:sid>', methods=['GET'])
 def get_shopcart(sid):
     carts = [cart for cart in shopping_carts if cart['sid']==sid]
     if len(carts) > 0:
-        message = carts[0]['products']
-        if not message:
-            message='The cart contains no products'
+        message = carts[0]
         rc = HTTP_200_OK
     else:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
@@ -139,7 +133,7 @@ def get_shopcart(sid):
 ######################################################################
 # RETRIEVE USER'S PRODUCTS LIST IN THE CART
 ######################################################################
-#USAGE: /shopcarts/3/products or /shopcarts/3/products?sku=114672050 for querying for a product
+# USAGE: /shopcarts/3/products or /shopcarts/3/products?sku=114672050 for querying for a product
 @app.route('/shopcarts/<int:sid>/products', methods=['GET'])
 def get_products(sid):
     carts = [cart for cart in shopping_carts if cart['sid']==sid]
@@ -173,7 +167,7 @@ def get_products(sid):
 ######################################################################
 # RETRIEVE A PRODUCT FROM USER'S SHOPCART
 ######################################################################
-#USAGE: /shopcarts/3/products/114672050
+# USAGE: /shopcarts/3/products/114672050
 @app.route('/shopcarts/<int:sid>/products/<int:sku>', methods=['GET'])
 def get_product(sid,sku):
     carts = [cart for cart in shopping_carts if cart['sid']==sid]
