@@ -193,10 +193,15 @@ def create_shopcarts():
         id = next_sid()
         if 'products' not in payload:
             payload['products'] = []
-        shopcart = {'uid': payload['uid'],'sid': id, 'products': payload['products'], 'subtotal': 0.0}
-        shopping_carts.append(shopcart)
-        message = shopcart
-        rc = HTTP_201_CREATED
+        for i in range(0,len(shopping_carts)):
+            if shopping_carts[i]['uid'] == payload['uid']:
+                message = { 'error' : 'Shopping Cart for uid %s already exists' %str(payload['uid']) }
+                rc = HTTP_400_BAD_REQUEST
+            else:
+                shopcart = {'uid': payload['uid'],'sid': id, 'products': payload['products'], 'subtotal': 0.0}
+                shopping_carts.append(shopcart)
+                message = shopcart
+                rc = HTTP_201_CREATED
     else:
         message = { 'error' : 'Data is not valid' }
         rc = HTTP_400_BAD_REQUEST
