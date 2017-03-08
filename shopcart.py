@@ -106,7 +106,7 @@ def list_shopcarts():
 
         results=[cart for cart in shopping_carts if cart['sid']==int(sid)]
         if len(results)!=0:
-            results=shopping_carts[0]
+            results=results[0]
         else:
             results=shopping_carts
     else:
