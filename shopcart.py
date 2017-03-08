@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import urllib
 import os
 import logging
 from threading import Lock
@@ -92,19 +93,19 @@ def index():
 ######################################################################
 # LIST ALL SHOPCARTS FOR ALL USERS
 ######################################################################
-# USAGE: /shopcarts or /shopcarts?sid=1 for quering for a user
+# USAGE: /shopcarts or /shopcarts?uid=1 for quering for a user
 @app.route('/shopcarts', methods=['GET'])
 def list_shopcarts():
     results=[]
-    sid=request.args.get('sid')
-    if sid:
+    uid=request.args.get('uid')
+    if uid:
         #Extra check for query input
         try:
-            sid = int(sid)
+            uid = int(uid)
         except ValueError:
             return make_response(jsonify(shopping_carts), HTTP_200_OK)
 
-        results=[cart for cart in shopping_carts if cart['sid']==int(sid)]
+        results=[cart for cart in shopping_carts if cart['uid']==int(uid)]
         if len(results)!=0:
             results=results[0]
         else:
@@ -137,20 +138,14 @@ def get_shopcart(sid):
 @app.route('/shopcarts/<int:sid>/products', methods=['GET'])
 def get_products(sid):
     carts = [cart for cart in shopping_carts if cart['sid']==sid]
-    sku = request.args.get('sku')
+    name = request.args.get('name')
     if len(carts) > 0:
         products = carts[0]['products']
         if(len(products)==0):
             message='The cart contains no products'
         else:
-            if sku:
-                #Extra check for query input
-                try:
-                    sku = int(sku)
-                except ValueError:
-                    return make_response(jsonify(products), HTTP_200_OK)
-
-                message=[product for product in products if product['sku']==int(sku)]
+            if name:
+                message=[product for product in products if product['name'].lower()==urllib.unquote(name).lower()]
                 if len(message)==0:
                     message=products
                 else:
