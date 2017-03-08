@@ -273,7 +273,9 @@ def put_product(sid, sku):
     else:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
         rc = HTTP_404_NOT_FOUND
-        return make_response(jsonify(message), rc)
+        response = make_response(jsonify(message), rc)
+
+    return response
 
 ######################################################################
 # DELETE A SHOPPING CART
