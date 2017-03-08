@@ -103,17 +103,21 @@ def list_shopcarts():
         try:
             uid = int(uid)
         except ValueError:
-            return make_response(jsonify(shopping_carts), HTTP_200_OK)
+            message={ 'error' : 'Data is not valid' }
+            return make_response(jsonify(message), HTTP_400_BAD_REQUEST)
 
         results=[cart for cart in shopping_carts if cart['uid']==int(uid)]
         if len(results)!=0:
             results=results[0]
+            rc=HTTP_200_OK
         else:
-            results=shopping_carts
+            results={ 'error' : 'Shopping Cart under user id: %s was not found' % str(uid) }
+            rc=HTTP_404_NOT_FOUND
     else:
         results=shopping_carts
+        rc=HTTP_200_OK
 
-    return make_response(jsonify(results), HTTP_200_OK)
+    return make_response(jsonify(results), rc)
 
 ######################################################################
 # RETRIEVE A USER'S CART
@@ -147,12 +151,14 @@ def get_products(sid):
             if name:
                 message=[product for product in products if product['name'].lower()==urllib.unquote(name).lower()]
                 if len(message)==0:
-                    message=products
+                    message={ 'error' : 'Product with name: %s was not found' % urllib.unquote(name) }
+                    rc=HTTP_404_NOT_FOUND
                 else:
                     message=message[0]
+                    rc = HTTP_200_OK
             else:
                 message=products
-        rc = HTTP_200_OK
+                rc = HTTP_200_OK
     else:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
         rc = HTTP_404_NOT_FOUND
