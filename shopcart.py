@@ -238,7 +238,13 @@ def create_products(sid):
         if is_valid_product(payload):
             for i in range(0,len(payload['products'])):
                 product = {'sku': payload['products'][i]['sku'],'quantity': payload['products'][i]['quantity'], 'name': payload['products'][i]['name'], 'unitprice' : payload['products'][i]['unitprice']}
-                cart[0]['products'].append(product)
+                if len(cart[0]['products']) == 1:
+                    if cart[0]['products'][0] == []:
+                        cart[0]['products'].remove(cart[0]['products'][0])
+                    cart[0]['products'].append(product)
+                else:
+                    cart[0]['products'].append(product)
+
             message = cart[0]
             rc = HTTP_201_CREATED
         else:
