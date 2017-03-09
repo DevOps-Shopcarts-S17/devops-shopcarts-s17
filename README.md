@@ -19,8 +19,8 @@ Please visit
 * **Tejas Rao Chagarlamudi** - [trc311](https://github.com/trc311)
 
 ## Description
-Request | Link | Functionality     
-------- | ---------------- | ----------:
+Request | Link | Functionality | Sample Content    
+------- | :---------------- | :---------- | :----------
 GET  | / | Show Index page
 GET  | /shopcarts        | List all shopcarts      
 GET  | /shopcarts/{sid} | List a specific shopcart   
@@ -28,4 +28,10 @@ GET  | /shopcarts?uid={uid} | Query for a specific shopcart
 GET  | /shopcarts/{sid}/products | List all products in a shopcart
 GET  | /shopcarts/{sid}/products/{sku} | List a specific product in a shopcart
 GET  | /shopcarts/{sid}/products?name={name} | Query for a specific product in a shopcart
-POST | /shopcarts/{uid=4} | Create a new empty cart for a user
+POST | /shopcarts/ | Create a new empty cart for a user | {"uid":4}
+POST | /shopcarts/ | Create a new cart along with some products for a user | {"uid": 5,"products": [{"sku": 44982050,"quantity": 2,"name": "Scattegories","unitprice": 8.99}]}
+POST | /shopcarts/{sid}/products | Add a new product to the cart | {"products": [{"sku": 218672050,"quantity": 12,"name": "Taboo","unitprice": 1.99}]}
+PUT | /shopcarts/{sid}/products/{sku} | Update a product in the cart | {"products": [{"sku": 218672050,"quantity": 13,"name": "Taboo","unitprice": 3.99}]}
+DELETE | /shopcarts/{sid} | Delete a shopcart
+DELETE | /shopcarts/{sid}/products/{sku} | Delete a product in a cart
+PUT | /shopcarts/{sid}/subtotal | ACTION: update subtotal of the cart

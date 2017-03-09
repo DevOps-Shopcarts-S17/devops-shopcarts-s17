@@ -276,7 +276,6 @@ def put_product(sid, sku):
     if len(cart) > 0:
         payload = request.get_json()
         products = payload['products']
-
         if is_valid_product(payload) and len(products) == 1:
             updated_product = {'sku': products[0]['sku'], 'quantity': products[0]['quantity'], 'name': products[0]['name'], 'unitprice': products[0]['unitprice']}
             print(updated_product)
