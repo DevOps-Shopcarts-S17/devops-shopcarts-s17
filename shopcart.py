@@ -149,6 +149,9 @@ def get_products(sid):
             message='The cart contains no products'
         else:
             if name:
+                if name.startswith('"') and name.endswith('"'):
+                    name = name[1:-1]
+
                 message=[product for product in products if product['name'].lower()==urllib.unquote(name).lower()]
                 if len(message)==0:
                     message={ 'error' : 'Product with name: %s was not found' % urllib.unquote(name) }
