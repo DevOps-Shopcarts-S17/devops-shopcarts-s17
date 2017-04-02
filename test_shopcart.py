@@ -28,11 +28,9 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertTrue ('Shopcart Demo REST API Service' in resp.data)
 
-
-    def test_create_shopcarts(self):
+    def test_create_shopcart_empty_json(self):
         # save the current number of shopcarts for later comparrison
         shopcart_count = self.get_shopcart_count()
-
         # add a new invalid shopcart
         new_shopcart = {}
         data = json.dumps(new_shopcart)
@@ -44,6 +42,9 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( len(data), shopcart_count)
 
+    def test_create_shopcart_invalid_json(self):
+        # save the current number of shopcarts for later comparrison
+        shopcart_count = self.get_shopcart_count()
         # add a new invalid shopcart
         new_shopcart = { "uid": 6, "products": {"hi":"hello"} }
         data = json.dumps(new_shopcart)
@@ -55,6 +56,9 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( len(data), shopcart_count)
 
+    def test_create_shopcart_bad_json(self):
+        # save the current number of shopcarts for later comparrison
+        shopcart_count = self.get_shopcart_count()
         # add a new invalid shopcart
         new_shopcart = "uid : 6"
         data = json.dumps(new_shopcart)
@@ -66,6 +70,9 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( len(data), shopcart_count)
 
+    def test_create_shopcart_existing_sid(self):
+        # save the current number of shopcarts for later comparrison
+        shopcart_count = self.get_shopcart_count()
         # add a new invalid shopcart
         new_shopcart = {"uid": 1}
         data = json.dumps(new_shopcart)
@@ -77,6 +84,10 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( len(data), shopcart_count)
 
+
+    def test_create_valid_shopcart_only_sid_json(self):
+        # save the current number of shopcarts for later comparrison
+        shopcart_count = self.get_shopcart_count()
         # add a new valid shopcart
         new_shopcart = {"uid": 5}
         data = json.dumps(new_shopcart)
@@ -92,6 +103,10 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( len(data), shopcart_count + 1 )
         self.assertIn( new_json, data )
 
+
+    def test_create_shopcarts_valid_complete_json(self):
+        # save the current number of shopcarts for later comparrison
+        shopcart_count = self.get_shopcart_count()
         # add a new valid shopcart
         new_shopcart = { "uid": 6, "products": [{"sku" : 114672050, "quantity" : 665555, "name" : "Lego" , "unitprice" : 43.12}, {"sku" : 114342051, "quantity" : 4, "name" : "Taboo" , "unitprice" : 3.76}] }
         data = json.dumps(new_shopcart)
@@ -104,13 +119,13 @@ class TestShopcartServer(unittest.TestCase):
         resp = self.app.get('/shopcarts')
         data = json.loads(resp.data)
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
-        self.assertEqual( len(data), shopcart_count + 2 )
+        self.assertEqual( len(data), shopcart_count + 1 )
         self.assertIn( new_json, data )
 
-    def test_create_products(self):
+
+    def test_create_products_empty_json(self):
         # save the current number of products for later comparrison
         initial_product_count = self.get_product_count()
-
         # add a new invalid product
         new_product = {}
         data = json.dumps(new_product)
@@ -122,6 +137,9 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( product_count, initial_product_count)
 
+    def test_create_products_bad_json(self):
+        # save the current number of products for later comparrison
+        initial_product_count = self.get_product_count()
         # add a new invalid product
         new_product = "products: [{sku : 114672050, quantity : 665555, name : Lego , unitprice : 43.12}]"
         data = json.dumps(new_product)
@@ -133,6 +151,9 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( product_count, initial_product_count)
 
+    def test_create_products_invalid_json(self):
+        # save the current number of products for later comparrison
+        initial_product_count = self.get_product_count()
         # add a new invalid product
         new_product = { "products": [{"sku" : 114672050, "quantity" : 665555, "name" : "Lego" , "unitprice" : 43.12}, {"sku" : 114342051, "quantity" : 4, "name" : "Taboo"}] }
         data = json.dumps(new_product)
@@ -144,12 +165,18 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( product_count, initial_product_count)
 
+    def test_create_products_invalid_shopcart(self):
+        # save the current number of products for later comparrison
+        initial_product_count = self.get_product_count()
         # add a new valid product to an invalid shopcart
         new_product = { "products": [{"sku" : 114672052, "quantity" : 665555, "name" : "Lego" , "unitprice" : 43.12}, {"sku" : 114342051, "quantity" : 4, "name" : "Taboo" , "unitprice" : 3.76}] }
         data = json.dumps(new_product)
         resp = self.app.post('/shopcarts/35/products', data=data, content_type='application/json')
         self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
-        
+
+    def test_create_products_valid_json(self):
+        # save the current number of products for later comparrison
+        initial_product_count = self.get_product_count()
         # add a new valid product to an valid shopcart
         new_product = { "products": [{"sku" : 114672050, "quantity" : 665555, "name" : "Lego" , "unitprice" : 43.12}, {"sku" : 114342051, "quantity" : 4, "name" : "Taboo" , "unitprice" : 3.76}] }
         data = json.dumps(new_product)
