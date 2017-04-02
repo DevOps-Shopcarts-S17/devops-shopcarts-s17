@@ -1,1 +1,4 @@
 Flask==0.12
+Flask-API==0.6.9
+# Code coverage
+coverage==4.2
