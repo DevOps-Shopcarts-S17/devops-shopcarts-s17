@@ -28,6 +28,11 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertTrue ('Shopcart Demo REST API Service' in resp.data)
 
+    def test_list_shopcarts(self):
+        resp = self.app.get('/shopcarts')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        self.assertTrue( len(resp.data) > 0 )
+
     def test_create_shopcart_empty_json(self):
         # save the current number of shopcarts for later comparrison
         shopcart_count = self.get_shopcart_count()
