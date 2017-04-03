@@ -215,6 +215,27 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( product_count, initial_product_count + 2)
 
+    def test_delete_shopcarts_exist(self):
+        # save the current number of shopcarts for later comparison
+        shopcart_count = self.get_shopcart_count()
+        # delete a shopcart that exists
+        resp = self.app.delete('/shopcarts/2', content_type='application/json')
+        self.assertEqual( resp.status_code, status.HTTP_204_NO_CONTENT )
+        self.assertEqual( len(resp.data), 0 )
+        new_count = self.get_shopcart_count()
+        self.assertEqual( new_count, shopcart_count - 1)
+
+    def test_delete_shopcarts_nonexist(self):
+        # save the current number of shopcarts for later comparison
+        shopcart_count = self.get_shopcart_count()
+        # delete a shopcart that doesn't exist
+        resp = self.app.delete('/shopcarts/0', content_type='application/json')
+        self.assertEqual( resp.status_code, status.HTTP_204_NO_CONTENT )
+        self.assertEqual( len(resp.data), 0 )
+        new_count = self.get_shopcart_count()
+        self.assertEqual( new_count, shopcart_count )
+
+
 ######################################################################
 # Utility functions
 ######################################################################
