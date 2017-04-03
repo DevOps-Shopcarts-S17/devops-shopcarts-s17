@@ -33,6 +33,16 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertTrue( len(resp.data) > 0 )
 
+    def test_get_shopcart(self):
+        resp = self.app.get('/shopcarts/3')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        data = json.loads(resp.data)
+        self.assertEqual (data['products'][0]['name'], 'Game of Life')
+
+    def test_get_shopcart_not_found(self):
+        resp = self.app.get('/shopcarts/0')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
+
     def test_create_shopcart_empty_json(self):
         # save the current number of shopcarts for later comparrison
         shopcart_count = self.get_shopcart_count()
