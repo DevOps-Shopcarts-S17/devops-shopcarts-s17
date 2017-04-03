@@ -44,16 +44,16 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
 
     def test_get_product_sid_exist_product_sku_exist(self):
-        resp = self.app.get('/shopcarts/1/products/123456780')
+        resp = self.app.get('/shopcarts/1/products/876543210')
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         data = json.loads(resp.data)
         self.assertTrue ( len(resp.data) > 0 )
 
     def test_get_product_sid_exist_product_sku_nonexist(self):
-        resp = self.app.get('/shopcarts/3/products/123456780')
+        resp = self.app.get('/shopcarts/3/products/876543210')
         self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
         data = json.loads(resp.data)
-        self.assertTrue ( 'Product with sku: 123456780 was not found in the cart for user 3' in resp.data )
+        self.assertTrue ( 'Product with sku: 876543210 was not found in the cart for user 3' in resp.data )
 
     def test_get_product_sid_nonexist(self):
         resp = self.app.get('/shopcarts/0/products/123456780')
