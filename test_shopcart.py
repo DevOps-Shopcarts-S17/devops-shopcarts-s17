@@ -43,6 +43,24 @@ class TestShopcartServer(unittest.TestCase):
         resp = self.app.get('/shopcarts/0')
         self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
 
+    def test_get_product_sid_exist_product_sku_exist(self):
+        resp = self.app.get('/shopcarts/1/products/123456780')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        data = json.loads(resp.data)
+        self.assertTrue ( len(resp.data) > 0 )
+
+    def test_get_product_sid_exist_product_sku_nonexist(self):
+        resp = self.app.get('/shopcarts/3/products/123456780')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
+        data = json.loads(resp.data)
+        self.assertTrue ( 'Product with sku: 123456780 was not found in the cart for user 3' in resp.data )
+
+    def test_get_product_sid_nonexist(self):
+        resp = self.app.get('/shopcarts/0/products/123456780')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
+        data = json.loads(resp.data)
+        self.assertTrue ( 'Shopping Cart with id: 0 was not found' in resp.data )
+
     def test_create_shopcart_empty_json(self):
         # save the current number of shopcarts for later comparrison
         shopcart_count = self.get_shopcart_count()
