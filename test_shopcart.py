@@ -235,6 +235,34 @@ class TestShopcartServer(unittest.TestCase):
         new_count = self.get_shopcart_count()
         self.assertEqual( new_count, shopcart_count )
 
+    def test_delete_product_exist(self):
+        # assuming shopcarts/1/products is not empty.
+        # save the current number of products for later comparison
+        shopcart_count = self.get_product_count_by_shopcart(1)
+        # delete a product that exists
+        resp = self.app.delete('/shopcarts/1/products/123456780', content_type='application/json')
+        self.assertEqual( resp.status_code, status.HTTP_204_NO_CONTENT )
+        self.assertEqual( len(resp.data), 0 )
+        new_count = self.get_product_count_by_shopcart(1)
+        self.assertEqual( new_count, shopcart_count - 1)
+
+    def test_delete_product_valid_shopcart_invalid_product(self):
+        # assuming shopcarts/1/products is not empty.
+        # save the current number of products for later comparison
+        shopcart_count = self.get_product_count_by_shopcart(1)
+        # delete a product that doesn't exist
+        resp = self.app.delete('/shopcarts/1/products/111111111', content_type='application/json')
+        self.assertEqual( resp.status_code, status.HTTP_204_NO_CONTENT )
+        self.assertEqual( len(resp.data), 0 )
+        new_count = self.get_product_count_by_shopcart(1)
+        self.assertEqual( new_count, shopcart_count )
+
+    def test_delete_product_invalid_shopcart_invalid_product(self):
+        # assuming shopcarts/10 not exist.
+        resp = self.app.delete('/shopcarts/10/products/111111111', content_type='application/json')
+        self.assertEqual( resp.status_code, status.HTTP_204_NO_CONTENT )
+        self.assertEqual( len(resp.data), 0 )
+
 
 ######################################################################
 # Utility functions
@@ -249,10 +277,7 @@ class TestShopcartServer(unittest.TestCase):
 
     def get_product_count(self):
         # save the current number of products
-        resp = self.app.get('/shopcarts/2/products')
-        self.assertEqual( resp.status_code, status.HTTP_200_OK )
-        product_count = self.check_product_quantity(resp)
-        return product_count
+        return self.get_product_count_by_shopcart(2)
 
     def check_product_quantity(self,resp):
         data = json.loads(resp.data)
@@ -260,6 +285,12 @@ class TestShopcartServer(unittest.TestCase):
             return 0
         else:
             return len(data)
+
+    def get_product_count_by_shopcart(self, shopcart_id):
+        resp = self.app.get('/shopcarts/%s/products' % str(shopcart_id))
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        product_count = self.check_product_quantity(resp)
+        return product_count
 
 ######################################################################
 #   M A I N
