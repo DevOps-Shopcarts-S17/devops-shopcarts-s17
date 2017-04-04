@@ -146,8 +146,12 @@ def get_products(sid):
     if len(carts) > 0:
         products = carts[0]['products']
         if(len(products)==0):
-            message='The cart contains no products'
-            rc = HTTP_200_OK
+            if name:
+                message={ 'error' : 'Product with name: %s was not found' % urllib.unquote(name) }
+                rc=HTTP_404_NOT_FOUND
+            else:
+                message='The cart contains no products'
+                rc = HTTP_200_OK
         else:
             if name:
                 if name.startswith('"') and name.endswith('"'):
