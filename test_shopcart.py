@@ -179,6 +179,48 @@ class TestShopcartServer(unittest.TestCase):
         data = json.loads(resp.data)
         self.assertEqual( data['subtotal'], 13.99)
 
+
+    def test_create_shopcart_without_products(self):
+        # save the current number of shopcarts for later comparrison
+        shopcart_count = self.get_shopcart_count()
+        # add a new valid shopcart
+        new_shopcart = {"uid": 15}
+        data = json.dumps(new_shopcart)
+        resp = self.app.post('/shopcarts', data=data, content_type='application/json')
+        self.assertEqual( resp.status_code, status.HTTP_201_CREATED )
+        # Check the data is correct
+        new_json = json.loads(resp.data)
+        self.assertEqual (new_json['uid'], 15)
+        # check that list of shopcarts has been updated and has a new shopcart
+        resp = self.app.get('/shopcarts/'+str(server.current_shopping_cart_id))
+        data = json.loads(resp.data)
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+
+        # save the current number of products for later comparrison
+        initial_product_count = self.get_product_count_by_shopcart(server.current_shopping_cart_id)
+        # add a new valid product to an valid shopcart
+        new_product = { "products": [{"sku" : 114672050, "quantity" : 665555, "name" : "Lego" , "unitprice" : 43.12}, {"sku" : 114342051, "quantity" : 4, "name" : "Taboo" , "unitprice" : 3.76}] }
+        data = json.dumps(new_product)
+        resp = self.app.post('/shopcarts/'+str(server.current_shopping_cart_id)+'/products', data=data, content_type='application/json')
+        self.assertEqual( resp.status_code, status.HTTP_201_CREATED )
+        new_json = json.loads(resp.data)
+
+        for i in range(0,len(new_json['products'])):
+            if new_json['products'][i]['sku'] == 114672052:
+                self.assertEqual (new_json['products'][i]['quantity'], 665555)
+                self.assertEqual (new_json['products'][i]['name'], "Lego")
+                self.assertEqual (new_json['products'][i]['unitprice'], 43.12)
+            elif new_json['products'][i]['sku'] == 114342051:
+                self.assertEqual (new_json['products'][i]['quantity'], 4)
+                self.assertEqual (new_json['products'][i]['name'], "Taboo")
+                self.assertEqual (new_json['products'][i]['unitprice'], 3.76)
+
+        # check that list of products has been updated and has the new product
+        resp = self.app.get('/shopcarts/'+str(server.current_shopping_cart_id)+'/products')
+        product_count = self.check_product_quantity(resp)
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        self.assertEqual( product_count, initial_product_count + 2)
+
     def test_create_shopcart_empty_json(self):
         # save the current number of shopcarts for later comparrison
         shopcart_count = self.get_shopcart_count()
@@ -274,7 +316,7 @@ class TestShopcartServer(unittest.TestCase):
 
     def test_create_products_empty_json(self):
         # save the current number of products for later comparrison
-        initial_product_count = self.get_product_count()
+        initial_product_count = self.get_product_count_by_shopcart(2)
         # add a new invalid product
         new_product = {}
         data = json.dumps(new_product)
@@ -288,7 +330,7 @@ class TestShopcartServer(unittest.TestCase):
 
     def test_create_products_bad_json(self):
         # save the current number of products for later comparrison
-        initial_product_count = self.get_product_count()
+        initial_product_count = self.get_product_count_by_shopcart(2)
         # add a new invalid product
         new_product = "products: [{sku : 114672050, quantity : 665555, name : Lego , unitprice : 43.12}]"
         data = json.dumps(new_product)
@@ -302,7 +344,7 @@ class TestShopcartServer(unittest.TestCase):
 
     def test_create_products_invalid_json(self):
         # save the current number of products for later comparrison
-        initial_product_count = self.get_product_count()
+        initial_product_count = self.get_product_count_by_shopcart(2)
         # add a new invalid product
         new_product = { "products": [{"sku" : 114672050, "quantity" : 665555, "name" : "Lego" , "unitprice" : 43.12}, {"sku" : 114342051, "quantity" : 4, "name" : "Taboo"}] }
         data = json.dumps(new_product)
@@ -316,7 +358,7 @@ class TestShopcartServer(unittest.TestCase):
 
     def test_create_products_invalid_shopcart(self):
         # save the current number of products for later comparrison
-        initial_product_count = self.get_product_count()
+        initial_product_count = self.get_product_count_by_shopcart(2)
         # add a new valid product to an invalid shopcart
         new_product = { "products": [{"sku" : 114672052, "quantity" : 665555, "name" : "Lego" , "unitprice" : 43.12}, {"sku" : 114342051, "quantity" : 4, "name" : "Taboo" , "unitprice" : 3.76}] }
         data = json.dumps(new_product)
@@ -325,7 +367,7 @@ class TestShopcartServer(unittest.TestCase):
 
     def test_create_products_valid_json(self):
         # save the current number of products for later comparrison
-        initial_product_count = self.get_product_count()
+        initial_product_count = self.get_product_count_by_shopcart(2)
         # add a new valid product to an valid shopcart
         new_product = { "products": [{"sku" : 114672050, "quantity" : 665555, "name" : "Lego" , "unitprice" : 43.12}, {"sku" : 114342051, "quantity" : 4, "name" : "Taboo" , "unitprice" : 3.76}] }
         data = json.dumps(new_product)
@@ -507,16 +549,15 @@ class TestShopcartServer(unittest.TestCase):
         data = json.loads(resp.data)
         return len(data)
 
-    def get_product_count(self):
-        # save the current number of products
-        return self.get_product_count_by_shopcart(2)
-
     def check_product_quantity(self,resp):
         data = json.loads(resp.data)
         if resp.data == '"The cart contains no products"\n':
             return 0
         else:
-            return len(data)
+            if data[0]==[]:
+                return 0
+            else:
+                return len(data)
 
     def get_product_count_by_shopcart(self, shopcart_id):
         resp = self.app.get('/shopcarts/%s/products' % str(shopcart_id))
