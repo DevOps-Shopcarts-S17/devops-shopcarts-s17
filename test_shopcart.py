@@ -61,6 +61,18 @@ class TestShopcartServer(unittest.TestCase):
         data = json.loads(resp.data)
         self.assertTrue ( 'Shopping Cart with id: 0 was not found' in resp.data )
 
+    def test_get_subtotal_invalid_sid(self):
+        resp = self.app.put('/shopcarts/0/subtotal')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
+        data = json.loads(resp.data)
+        self.assertTrue ( 'Shopping Cart with id: 0 was not found' in resp.data )
+
+    def test_get_subtotal_valid_sid(self):
+        resp = self.app.put('/shopcarts/3/subtotal')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        data = json.loads(resp.data)
+        self.assertEqual( data['subtotal'], 13.99)
+
     def test_create_shopcart_empty_json(self):
         # save the current number of shopcarts for later comparrison
         shopcart_count = self.get_shopcart_count()
@@ -136,7 +148,6 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( len(data), shopcart_count + 1 )
         self.assertIn( new_json, data )
 
-
     def test_create_shopcarts_valid_complete_json(self):
         # save the current number of shopcarts for later comparrison
         shopcart_count = self.get_shopcart_count()
@@ -154,7 +165,6 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertEqual( len(data), shopcart_count + 1 )
         self.assertIn( new_json, data )
-
 
     def test_create_products_empty_json(self):
         # save the current number of products for later comparrison
