@@ -33,6 +33,10 @@ Vagrant.configure(2) do |config|
     config.vm.provision "file", source: "~/.gitconfig", destination: "~/.gitconfig"
   end
 
+  config.vm.synced_folder "./", "/vagrant",
+    owner: "vagrant",
+    mount_options: ["dmode=775,fmode=600"]
+
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
