@@ -119,6 +119,48 @@ class TestShopcartServer(unittest.TestCase):
         data = json.loads(resp.data)
         self.assertTrue ( 'Product with sku: 876543210 was not found in the cart for user 3' in resp.data )
 
+    def test_get_products(self):
+        resp = self.app.get('/shopcarts/2/products')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+
+    def test_get_products_empty(self):
+        resp = self.app.get('/shopcarts/2/products')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        self.assertEqual( resp.data, '"The cart contains no products"\n' )
+
+    def test_get_products_sid_nonexist(self):
+        resp = self.app.get('/shopcarts/47/products')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = json.loads(resp.data)
+        self.assertTrue(len(data) == 1)
+        self.assertTrue(data['error'] == "Shopping Cart with id: 47 was not found")
+
+    def test_get_products_name(self):
+        resp = self.app.get('/shopcarts/1/products?name=Settlers of Catan')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        data = json.loads(resp.data)
+        self.assertTrue(data['name'] == "Settlers of Catan")
+
+    def test_get_products_name_with_quotes(self):
+        resp = self.app.get('/shopcarts/3/products?name=\"Game of Life\"')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+        data = json.loads(resp.data)
+        self.assertTrue(data['name'] == "Game of Life")
+
+    def test_get_products_name_empty(self):
+        resp = self.app.get('/shopcarts/2/products?name=Catan Expansion Pack')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = json.loads(resp.data)
+        self.assertTrue(len(data) == 1)
+        self.assertTrue(data['error'] == "Product with name: Catan Expansion Pack was not found")
+
+    def test_get_products_name_nonexist(self):
+        resp = self.app.get('/shopcarts/3/products?name=Catan Expansion Pack')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = json.loads(resp.data)
+        self.assertTrue(len(data) == 1)
+        self.assertTrue(data['error'] == "Product with name: Catan Expansion Pack was not found")
+
     def test_get_product_sid_nonexist(self):
         resp = self.app.get('/shopcarts/0/products/123456780')
         self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
