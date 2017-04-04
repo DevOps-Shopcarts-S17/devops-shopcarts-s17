@@ -18,9 +18,52 @@ class TestShopcartServer(unittest.TestCase):
         server.app.debug = True
         server.app.logger.addHandler(logging.StreamHandler())
         server.app.logger.setLevel(logging.CRITICAL)
+        server.shopping_carts = [
+            {
+                'uid':1,
+                'sid':  1,
+                'subtotal': 0.00,
+                'products': [
+                    {
+                        'sku': 123456780,
+                        'quantity': 2,
+                        'name': "Settlers of Catan",
+                        'unitprice': 27.99
+                    },
+                    {
+                        'sku': 876543210,
+                        'quantity': 1,
+                        'name': "Risk",
+                        'unitprice': 27.99
+                    }
+                ]
+            },
+            {
+                'uid':2,
+                'sid':  2,
+                'subtotal': 0.00,
+                'products': []
+            },
+            {
+                'uid': 3,
+                'sid': 3,
+                'subtotal': 0.00,
+                'products': [
+                    {
+                        'sku': 114672050,
+                        'quantity': 1,
+                        'name': "Game of Life",
+                        'unitprice': 13.99
+                    }
+                ]
+            }
+        ]
+        server.current_shopping_cart_id = 3
         self.app = server.app.test_client()
 
     def tearDown(self):
+        server.shopping_carts = None
+        server.current_shopping_cart_id = 0
         pass
 
     def test_index(self):
@@ -280,6 +323,104 @@ class TestShopcartServer(unittest.TestCase):
         resp = self.app.delete('/shopcarts/10/products/111111111', content_type='application/json')
         self.assertEqual( resp.status_code, status.HTTP_204_NO_CONTENT )
         self.assertEqual( len(resp.data), 0 )
+
+    def test_put_product_valid_shopcart_valid_product(self):
+        product_new_information = {
+	       "products": [
+		       {
+			       "name": "Settlers of Catan",
+			       "quantity": 15,
+			       "sku": 123456780,
+			       "unitprice": 28.99
+		       }
+	        ]
+        }
+        data = json.dumps(product_new_information)
+        resp = self.app.put('/shopcarts/1/products/123456780', data=data, content_type='application/json')
+        self.assertTrue( len(resp.data) > 0)
+        cart = json.loads(resp.data)
+        self.assertTrue( cart is not None and cart["products"] is not None)
+        for product in cart["products"]:
+            if product["sku"] == 123456780:
+                self.assertEqual(product["unitprice"], 28.99)
+                self.assertEqual(product["quantity"], 15)
+
+    def test_put_product_change_sku(self):
+        product_new_information = {
+	       "products": [
+		       {
+			       "name": "Settlers of Catan",
+			       "quantity": 2,
+			       "sku": 123456789,
+			       "unitprice": 27.99
+		       }
+	        ]
+        }
+        data = json.dumps(product_new_information)
+        resp = self.app.put('/shopcarts/1/products/123456780', data=data, content_type='application/json')
+        self.assertTrue( len(resp.data) > 0)
+        cart = json.loads(resp.data)
+        self.assertTrue( cart is not None and cart["products"] is not None)
+        found_new_sku = False
+        for product in cart["products"]:
+            if product["sku"] == 123456789:
+                found_new_sku = True
+                self.assertEqual(product["name"], "Settlers of Catan")
+        self.assertTrue(found_new_sku)
+        # old sku should be invalid
+        resp = self.app.get('/shopcarts/1/products/123456780')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND )
+        # new sku should valid
+        resp = self.app.get('/shopcarts/1/products/123456789')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK )
+
+    def test_put_product_valid_shopcart_invalid_product(self):
+        product_new_information = {
+	       "products": [
+		       {
+			       "name": "Settlers of Catan",
+			       "quantity": 1,
+			       "sku": 123456789,
+			       "unitprice": 27.99
+		       }
+	        ]
+        }
+        data = json.dumps(product_new_information)
+        resp = self.app.put('/shopcarts/1/products/123456789', data=data, content_type='application/json')
+        self.assertTrue( len(resp.data) > 0)
+        self.assertTrue("Product 123456789 was not found" in resp.data)
+
+    def test_put_product_invalid_shopcart_invalid_product(self):
+        product_new_information = {
+	       "products": [
+		       {
+			       "name": "Settlers of Catan",
+			       "quantity": 1,
+			       "sku": 123456789,
+			       "unitprice": 27.99
+		       }
+	        ]
+        }
+        data = json.dumps(product_new_information)
+        resp = self.app.put('/shopcarts/10/products/123456789', data=data, content_type='application/json')
+        self.assertTrue( len(resp.data) > 0)
+        self.assertTrue("Shopping Cart with id: 10 was not found" in resp.data)
+
+    def test_put_product_invalid_json(self):
+        product_new_information = {
+	       "products": [
+		       {
+			       "name": "Settlers of Catan",
+			       "quantity": 1,
+			       "sku_id": 123456780,
+			       "unitprice": 27.99
+		       }
+	        ]
+        }
+        data = json.dumps(product_new_information)
+        resp = self.app.put('/shopcarts/1/products/123456780', data=data, content_type='application/json')
+        self.assertTrue( len(resp.data) > 0)
+        self.assertTrue("Product data is not valid" in resp.data)
 
 
 ######################################################################
