@@ -339,7 +339,7 @@ class TestShopcartServer(unittest.TestCase):
         resp = self.app.put('/shopcarts/1/products/123456780', data=data, content_type='application/json')
         self.assertTrue( len(resp.data) > 0)
         cart = json.loads(resp.data)
-        self.assertTrue( cart is not None and cart["products"] is not None)
+        self.assertTrue( cart is not None and "products" in cart and cart["products"] is not None)
         for product in cart["products"]:
             if product["sku"] == 123456780:
                 self.assertEqual(product["unitprice"], 28.99)
@@ -360,7 +360,7 @@ class TestShopcartServer(unittest.TestCase):
         resp = self.app.put('/shopcarts/1/products/123456780', data=data, content_type='application/json')
         self.assertTrue( len(resp.data) > 0)
         cart = json.loads(resp.data)
-        self.assertTrue( cart is not None and cart["products"] is not None)
+        self.assertTrue( cart is not None and "products" in cart and cart["products"] is not None)
         found_new_sku = False
         for product in cart["products"]:
             if product["sku"] == 123456789:
