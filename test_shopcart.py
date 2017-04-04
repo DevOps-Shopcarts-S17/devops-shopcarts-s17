@@ -33,6 +33,27 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         self.assertTrue( len(resp.data) > 0 )
 
+    def test_list_shopcarts_uid_param(self):
+        resp = self.app.get('/shopcarts?uid=1')
+        self.assertEqual( resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.data)
+        self.assertTrue(len(data) == 4)
+        self.assertTrue(data['uid'] == 1)
+
+    def test_list_shopcarts_uid_invalid(self):
+        resp = self.app.get('/shopcarts?uid=abc')
+        self.assertEqual( resp.status_code, status.HTTP_400_BAD_REQUEST)
+        data = json.loads(resp.data)
+        self.assertTrue(len(data) == 1)
+        self.assertEqual(data['error'], 'Data is not valid')
+
+    def test_list_shopcarts_uid_nonexist(self):
+        resp = self.app.get('/shopcarts?uid=10')
+        self.assertEqual( resp.status_code, status.HTTP_404_NOT_FOUND)
+        data = json.loads(resp.data)
+        self.assertTrue(len(data) == 1)
+        self.assertEqual(data['error'], 'Shopping Cart under user id: %s was not found' % 10)
+
     def test_get_shopcart(self):
         resp = self.app.get('/shopcarts/3')
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
