@@ -138,7 +138,7 @@ def get_shopcart(sid):
 ######################################################################
 # RETRIEVE USER'S PRODUCTS LIST IN THE CART
 ######################################################################
-# USAGE: /shopcarts/3/products or /shopcarts/3/products?sku=114672050 for querying for a product
+# USAGE: /shopcarts/3/products or /shopcarts/3/products?name=Settlers of Catan for querying for a product
 @app.route('/shopcarts/<int:sid>/products', methods=['GET'])
 def get_products(sid):
     carts = [cart for cart in shopping_carts if cart['sid']==sid]
@@ -283,7 +283,6 @@ def put_product(sid, sku):
         products = payload['products']
         if is_valid_product(payload) and len(products) == 1:
             updated_product = {'sku': products[0]['sku'], 'quantity': products[0]['quantity'], 'name': products[0]['name'], 'unitprice': products[0]['unitprice']}
-            print(updated_product)
 
             found_product = False
             for i in range(len(cart[0]['products'])):
