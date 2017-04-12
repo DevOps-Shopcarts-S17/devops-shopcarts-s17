@@ -1,4 +1,7 @@
 # devops-shopcarts-s17
+
+[![Build Status](https://travis-ci.org/DevOps-Shopcarts-S17/devops-shopcarts-s17.svg?branch=master)](https://travis-ci.org/DevOps-Shopcarts-S17/devops-shopcarts-s17)
+
 This repo by Echo Squad is for the development of shopcarts which is a collection of products to buy.
 # Usage
 Please visit
