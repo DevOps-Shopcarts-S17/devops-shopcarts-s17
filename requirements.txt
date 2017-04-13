@@ -6,3 +6,6 @@ rednose==1.2.1
 pinocchio==0.4.2
 coverage==4.2
 codecov==2.0.5
+# BDD
+behave==1.2.5
+selenium==3.3.1
