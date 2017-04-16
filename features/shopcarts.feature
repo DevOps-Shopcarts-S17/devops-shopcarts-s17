@@ -13,3 +13,6 @@ Scenario: List all shopcarts
     Then I should see "Settlers of Catan"
     And I should see "Risk"
     And I should see "Game of Life"
+    AND I should see shopcart with id "1"
+    And I should see shopcart with id "2"
+    And I should see shopcart with id "3"
