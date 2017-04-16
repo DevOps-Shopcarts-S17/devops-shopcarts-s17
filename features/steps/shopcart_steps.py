@@ -13,3 +13,18 @@ def step_impl(context, message):
 @then(u'I should not see "{message}"')
 def step_impl(context, message):
     assert message not in context.resp.data
+
+@then(u'I should see shopcart with id "{id}"')
+def step_impl(context, id):
+    data = json.loads(context.resp.data)
+    found_id = False
+    for cart in data:
+        if cart["sid"] == int(id):
+            found_id = True
+    assert found_id
+
+@when(u'I visit "{url}"')
+def step_impl(context, url):
+    context.resp = context.app.get(url)
+    assert context.resp.status_code == 200
+
