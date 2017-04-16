@@ -18,8 +18,3 @@ def step_impl(context, message):
 def step_impl(context, url):
     context.resp = context.app.get(url)
     assert context.resp.status_code == 200
-
-@when(u'I search shopcarts with uid "{uid}"')
-def step_impl(context, uid):
-    context.resp = context.app.get('shopcarts?uid='+uid)
-    assert context.resp.status_code == 200

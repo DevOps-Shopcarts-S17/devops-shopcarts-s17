@@ -13,9 +13,3 @@ Scenario: List all shopcarts
     Then I should see "Settlers of Catan"
     And I should see "Risk"
     And I should see "Game of Life"
-
-Scenario: List shopcart with given uid
-    When I search shopcarts with uid "3"
-    Then I should not see "Settlers of Catan"
-    And I should not see "Risk"
-    And I should see "Game of Life"
