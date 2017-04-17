@@ -54,3 +54,17 @@ def step_impl(context,sku,quantity,name,unitprice):
 			assert new_json['products'][0]['quantity'] == int(quantity)
 			assert new_json['products'][0]['name'] == name
 			assert new_json['products'][0]['unitprice'] == int(unitprice)
+
+@then(u'I should see shopcart with id "{id}"')
+def step_impl(context, id):
+    data = json.loads(context.resp.data)
+    found_id = False
+    for cart in data:
+        if cart["sid"] == int(id):
+            found_id = True
+    assert found_id
+
+@when(u'I visit "{url}"')
+def step_impl(context, url):
+    context.resp = context.app.get(url)
+    assert context.resp.status_code == 200

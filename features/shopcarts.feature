@@ -30,3 +30,12 @@ Scenario: Create a new shopcart
     | 7     | 119873437   | 55               | Lego         | 100               |
   Then I should see a new shopcart with uid "7"
   And I should see a product having sku "119873437", quantity "55", name "Lego" and unitprice "100"
+
+Scenario: List all shopcarts
+    When I visit "shopcarts"
+    Then I should see "Settlers of Catan"
+    And I should see "Risk"
+    And I should see "Game of Life"
+    And I should see shopcart with id "1"
+    And I should see shopcart with id "2"
+    And I should see shopcart with id "3"
