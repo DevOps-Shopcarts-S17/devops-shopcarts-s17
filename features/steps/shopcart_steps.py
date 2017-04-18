@@ -55,6 +55,24 @@ def step_impl(context,sku,quantity,name,unitprice):
 			assert new_json['products'][0]['name'] == name
 			assert new_json['products'][0]['unitprice'] == float(unitprice)
 
+@given(u'the following shopcarts')
+def step_impl(context):
+    context.resp = context.app.get('/shopcarts')
+    assert context.resp.status_code == 200
+
+@when(u'I search for a shopcart with sid "{id}"')
+def step_impl(context,id):
+    context.resp = context.app.get('/shopcarts/'+id)
+    context.get_shopcart = True
+
+@then(u'I should not see shopcart with id "{id}"')
+def step_impl(context,id):
+	data = json.loads(context.resp.data)
+	if 'sid' in data:
+		assert int(data['sid']) != int(id)
+	else:
+		assert context.resp.status_code == 404
+
 @given(u'a shopcart with uid "{id}" exists')
 def step_impl(context,id):
     context.resp = context.app.get('/shopcarts/'+id)
@@ -92,9 +110,15 @@ def step_impl(context,sku,quantity,name,unitprice):
 def step_impl(context, id):
     data = json.loads(context.resp.data)
     found_id = False
-    for cart in data:
-        if cart["sid"] == int(id):
-            found_id = True
+
+    if hasattr(context,'get_shopcart'):
+    	assert context.resp.status_code == 200
+    	if data['sid'] == int(id):
+    		found_id = True
+    else:
+    	for cart in data:
+    		if cart["sid"] == int(id):
+    			found_id = True
     assert found_id
 
 @when(u'I visit "{url}"')

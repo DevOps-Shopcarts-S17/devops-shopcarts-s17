@@ -31,6 +31,34 @@ Scenario: Create a new shopcart
   Then I should see a new shopcart with uid "7"
   And I should see a product having sku "119873437", quantity "55", name "Lego" and unitprice "100"
 
+Scenario: Get a particular shopcart
+  Given the following shopcarts
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 1     | 1     | 0.00     | 123456780   | 2                | Settlers of Catan | 27.99             |
+    | 1     | 1     | 0.00     | 876543210   | 1                | Risk              | 27.99             |
+    | 2     | 2     | 0.00     |             |                  |                   |                   |
+    | 3     | 3     | 0.00     | 114672050   | 1                | Game of Life      | 13.99             |
+  When I search for a shopcart with sid "3"
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 3     | 3     | 0.00     | 114672050   | 1                | Game of Life      | 13.99             |
+  Then I should see shopcart with id "3"
+  And I should see a product having sku "114672050", quantity "1", name "Game of Life" and unitprice "13.99 "
+  And I should not see shopcart with id "1"
+  And I should not see shopcart with id "2"
+
+Scenario: Get a particular shopcart
+  Given the following shopcarts
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 1     | 1     | 0.00     | 123456780   | 2                | Settlers of Catan | 27.99             |
+    | 1     | 1     | 0.00     | 876543210   | 1                | Risk              | 27.99             |
+    | 2     | 2     | 0.00     |             |                  |                   |                   |
+    | 3     | 3     | 0.00     | 114672050   | 1                | Game of Life      | 13.99             |
+  When I search for a shopcart with sid "13"
+  Then I should see "Shopping Cart with id: 13 was not found"
+  And I should not see shopcart with id "1"
+  And I should not see shopcart with id "2"
+  And I should not see shopcart with id "3"
+
 Scenario: Create a new product
   Given a shopcart with uid "2" exists
   When I load a new product with just sku "121987337", quantity "5", name "Carrom" in the shopcart
