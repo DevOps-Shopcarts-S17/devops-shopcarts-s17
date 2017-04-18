@@ -16,8 +16,6 @@ def step_impl(context):
 
 @then(u'I should see "{message}"')
 def step_impl(context, message):
-	print(message)
-	print(context.resp.data)
 	assert message in context.resp.data
 
 @then(u'I should not see "{message}"')
