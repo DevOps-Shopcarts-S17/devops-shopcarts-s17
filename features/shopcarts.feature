@@ -93,3 +93,24 @@ Scenario: List all shopcarts
     And I should see shopcart with id "1"
     And I should see shopcart with id "2"
     And I should see shopcart with id "3"
+
+Scenario: Update a product
+    Given a shopcart with uid "1" exists
+    When I change a product with sku "123456780" to sku "123456781", quantity "3", name "Catan Expansion", and unitprice "22.99"
+    Then I should see a product having sku "123456781", quantity "3", name "Catan Expansion" and unitprice "22.99"
+    And I should not see a product with sku "123456780"
+
+Scenario: Update a product
+    Given a shopcart with uid "54" does not exist
+    When I change a product with sku "123456780" to sku "123456781", quantity "3", name "Catan Expansion", and unitprice "22.99"
+    Then I should see "Shopping Cart with id: 54 was not found"
+
+Scenario: Update a product
+    Given a shopcart with uid "1" exists
+    When I change a product with sku "0" to sku "123456781", quantity "3", name "Catan Expansion", and unitprice "22.99"
+    Then I should see "Product 0 was not found in shopping cart 1"
+
+Scenario: Update a product
+    Given a shopcart with uid "3" exists
+    When I change a product with sku "114672050" to an empty product
+    Then I should see "Product data is not valid"
