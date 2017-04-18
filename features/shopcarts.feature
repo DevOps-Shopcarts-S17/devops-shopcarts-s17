@@ -31,6 +31,32 @@ Scenario: Create a new shopcart
   Then I should see a new shopcart with uid "7"
   And I should see a product having sku "119873437", quantity "55", name "Lego" and unitprice "100"
 
+Scenario: Create a new product
+  Given a shopcart with uid "2" exists
+  When I load a new product with just sku "121987337", quantity "5", name "Carrom" in the shopcart
+    | product sku | product quantity | product name |
+    | 121987337   | 5                | Carrom       |
+  Then I should see "Data is not valid"
+
+Scenario: Create a new product
+  Given a shopcart with uid "2" exists
+  When I load a new product without any details in the shopcart
+  Then I should see "Data is not valid"
+
+Scenario: Create a new product
+  Given a shopcart with uid "12" does not exist
+  When I load a new product with sku "121987567", quantity "15", name "Charades", unitprice "4.99" in the shopcart
+    | product sku | product quantity | product name | product unitprice |
+    | 121987567   | 15               | Charades     | 4.99              |
+  Then I should see "Shopping Cart with id: 12 was not found"
+
+Scenario: Create a new product
+  Given a shopcart with uid "2" exists
+  When I load a new product with sku "121986367", quantity "100", name "Scattegories", unitprice "64.99" in the shopcart
+    | product sku | product quantity | product name | product unitprice |
+    | 121986367   | 100              | Scattegories | 64.99              |
+  Then I should see a product having sku "121986367", quantity "100", name "Scattegories" and unitprice "64.99"
+
 Scenario: List all shopcarts
     When I visit "shopcarts"
     Then I should see "Settlers of Catan"
