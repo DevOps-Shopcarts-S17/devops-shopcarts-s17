@@ -116,3 +116,13 @@ Scenario: List all shopcarts
     And I should see shopcart with id "1"
     And I should see shopcart with id "2"
     And I should see shopcart with id "3"
+
+Scenario: Delete a shopcart
+    When I visit "shopcarts"
+    Then I should see shopcart with id "1"
+    And I should see shopcart with id "2"
+    And I should see shopcart with id "3"
+    When I delete "shopcarts" with id "3"
+    And I search for a shopcart with sid "3"
+    Then I should see "Shopping Cart with id: 3 was not found"
+

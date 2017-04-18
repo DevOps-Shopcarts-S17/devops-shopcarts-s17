@@ -77,14 +77,6 @@ def step_impl(context,sku):
     context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products/'+sku)
     context.get_product = True
 
-@then(u'I should not see shopcart with id "{id}"')
-def step_impl(context,id):
-	data = json.loads(context.resp.data)
-	if 'sid' in data:
-		assert int(data['sid']) != int(id)
-	else:
-		assert context.resp.status_code == 404
-
 @given(u'a shopcart with uid "{id}" exists')
 def step_impl(context,id):
     context.resp = context.app.get('/shopcarts/'+id)
@@ -143,7 +135,23 @@ def step_impl(context, id):
     			found_id = True
     assert found_id
 
+
+@then(u'I should not see shopcart with id "{id}"')
+def step_impl(context,id):
+    data = json.loads(context.resp.data)
+    if 'sid' in data:
+        assert int(data['sid']) != int(id)
+    else:
+        assert context.resp.status_code == 404
+
 @when(u'I visit "{url}"')
 def step_impl(context, url):
     context.resp = context.app.get(url)
     assert context.resp.status_code == 200
+
+@when(u'I delete "{url}" with id "{id}"')
+def step_impl(context, url, id):
+    target_url = '/{}/{}'.format(url, id)
+    context.resp = context.app.delete(target_url)
+    assert context.resp.status_code == 204
+    assert context.resp.data is ""
