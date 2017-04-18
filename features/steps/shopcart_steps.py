@@ -49,11 +49,18 @@ def step_impl(context,id):
 @then(u'I should see a product having sku "{sku}", quantity "{quantity}", name "{name}" and unitprice "{unitprice}"')
 def step_impl(context,sku,quantity,name,unitprice):
 	new_json = json.loads(context.resp.data)
-	for i in range(0,len(new_json['products'])):
-		if new_json['products'][0]['sku'] == int(sku):
-			assert new_json['products'][0]['quantity'] == int(quantity)
-			assert new_json['products'][0]['name'] == name
-			assert new_json['products'][0]['unitprice'] == float(unitprice)
+
+	if hasattr(context,'get_product'):
+		if new_json['sku'] == int(sku):
+			assert new_json['quantity'] == int(quantity)
+			assert new_json['name'] == name
+			assert new_json['unitprice'] == float(unitprice)
+	else:
+		for i in range(0,len(new_json['products'])):
+			if new_json['products'][i]['sku'] == int(sku):
+				assert new_json['products'][i]['quantity'] == int(quantity)
+				assert new_json['products'][i]['name'] == name
+				assert new_json['products'][i]['unitprice'] == float(unitprice)
 
 @given(u'the following shopcarts')
 def step_impl(context):
@@ -64,6 +71,11 @@ def step_impl(context):
 def step_impl(context,id):
     context.resp = context.app.get('/shopcarts/'+id)
     context.get_shopcart = True
+
+@when(u'I search for a product with sku "{sku}"')
+def step_impl(context,sku):
+    context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products/'+sku)
+    context.get_product = True
 
 @then(u'I should not see shopcart with id "{id}"')
 def step_impl(context,id):
@@ -83,6 +95,16 @@ def step_impl(context,id):
 def step_impl(context,id):
     context.resp = context.app.get('/shopcarts/'+id)
     context.current_shopcart = id
+    assert context.resp.status_code == 404
+
+@given(u'a product with sku "{sku}" exists')
+def step_impl(context,sku):
+    context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products/'+sku)
+    assert context.resp.status_code == 200
+
+@given(u'a product with sku "{sku}" does not exist')
+def step_impl(context,sku):
+    context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products/'+sku)
     assert context.resp.status_code == 404
 
 @when(u'I load a new product without any details in the shopcart')
