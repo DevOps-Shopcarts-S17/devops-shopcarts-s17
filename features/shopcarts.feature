@@ -59,6 +59,29 @@ Scenario: Get a particular shopcart
   And I should not see shopcart with id "2"
   And I should not see shopcart with id "3"
 
+Scenario: Get a particular product
+  Given a shopcart with uid "3" exists
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 3     | 3     | 0.00     | 114672050   | 1                | Game of Life      | 13.99             |
+  And a product with sku "114672050" exists
+  When I search for a product with sku "114672050"
+    | product sku | product quantity | product name      | product unitprice |
+    | 114672050   | 1                | Game of Life      | 13.99             |
+  Then I should see a product having sku "114672050", quantity "1", name "Game of Life" and unitprice "13.99"
+
+Scenario: Get a particular product
+  Given a shopcart with uid "3" exists
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 3     | 3     | 0.00     | 114672050   | 1                | Game of Life      | 13.99             |
+  And a product with sku "114672154" does not exist
+  When I search for a product with sku "114672154"
+  Then I should see "Product with sku: 114672154 was not found in the cart for user"
+
+Scenario: Get a particular product
+  Given a shopcart with uid "13" does not exist
+  When I search for a product with sku "114672050"
+  Then I should see "Shopping Cart with id: 13 was not found"
+
 Scenario: Create a new product
   Given a shopcart with uid "2" exists
   When I load a new product with just sku "121987337", quantity "5", name "Carrom" in the shopcart
