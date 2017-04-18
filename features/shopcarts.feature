@@ -54,7 +54,7 @@ Scenario: Create a new product
   Given a shopcart with uid "2" exists
   When I load a new product with sku "121986367", quantity "100", name "Scattegories", unitprice "64.99" in the shopcart
     | product sku | product quantity | product name | product unitprice |
-    | 121986367   | 100              | Scattegories | 64.99              |
+    | 121986367   | 100              | Scattegories | 64.99             |
   Then I should see a product having sku "121986367", quantity "100", name "Scattegories" and unitprice "64.99"
 
 Scenario: List all shopcarts
