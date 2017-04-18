@@ -17,10 +17,29 @@ import os
 import logging
 from threading import Lock
 from flask import Flask, Response, jsonify, request, make_response, json, url_for
+from flasgger import Swagger
 
 # Create Flask application
 app = Flask(__name__)
 app.config['LOGGING_LEVEL'] = logging.INFO
+
+# Swagger set up
+# Configure Swagger before initilaizing it
+app.config['SWAGGER'] = {
+    "swagger_version": "2.0",
+    "specs": [
+        {
+            "version": "1.0.0",
+            "title": "DevOps Swagger Shopcarts App",
+            "description": "This is a Shopping cart API server.",
+            "endpoint": 'v1_spec',
+            "route": '/v1/spec'
+        }
+    ]
+}
+
+# Initialize Swagger after configuring it
+Swagger(app)
 
 # Status Codes
 HTTP_200_OK = 200

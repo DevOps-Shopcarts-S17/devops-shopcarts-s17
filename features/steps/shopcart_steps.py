@@ -73,6 +73,39 @@ def step_impl(context,id):
 	else:
 		assert context.resp.status_code == 404
 
+@given(u'a shopcart with uid "{id}" exists')
+def step_impl(context,id):
+    context.resp = context.app.get('/shopcarts/'+id)
+    context.current_shopcart = id
+    assert context.resp.status_code == 200
+
+@given(u'a shopcart with uid "{id}" does not exist')
+def step_impl(context,id):
+    context.resp = context.app.get('/shopcarts/'+id)
+    context.current_shopcart = id
+    assert context.resp.status_code == 404
+
+@when(u'I load a new product without any details in the shopcart')
+def step_impl(context):
+	new_product = {}
+	data = json.dumps(new_product)
+	url = '/shopcarts/'+context.current_shopcart+'/products'
+	context.resp = context.app.post(url, data=data, content_type='application/json')
+
+@when(u'I load a new product with just sku "{sku}", quantity "{quantity}", name "{name}" in the shopcart')
+def step_impl(context,sku,quantity,name):
+	new_product = { "products": [{"sku" : int(sku), "quantity" : int(quantity), "name" : name}] }
+	data = json.dumps(new_product)
+	url = '/shopcarts/'+context.current_shopcart+'/products'
+	context.resp = context.app.post(url, data=data, content_type='application/json')
+
+@when(u'I load a new product with sku "{sku}", quantity "{quantity}", name "{name}", unitprice "{unitprice}" in the shopcart')
+def step_impl(context,sku,quantity,name,unitprice):
+	new_product = { "products": [{"sku" : int(sku), "quantity" : int(quantity), "name" : name, "unitprice" : float(unitprice)}] }
+	data = json.dumps(new_product)
+	url = '/shopcarts/'+context.current_shopcart+'/products'
+	context.resp = context.app.post(url, data=data, content_type='application/json')
+
 @then(u'I should see shopcart with id "{id}"')
 def step_impl(context, id):
     data = json.loads(context.resp.data)
