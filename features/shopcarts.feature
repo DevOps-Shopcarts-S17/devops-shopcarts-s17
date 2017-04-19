@@ -137,3 +137,12 @@ Scenario: Update a product
     Given a shopcart with uid "3" exists
     When I change a product with sku "114672050" to an empty product
     Then I should see "Product data is not valid"
+    
+Scenario: Delete a shopcart
+    When I visit "shopcarts"
+    Then I should see shopcart with id "1"
+    And I should see shopcart with id "2"
+    And I should see shopcart with id "3"
+    When I delete "shopcarts" with id "3"
+    And I search for a shopcart with sid "3"
+    Then I should see "Shopping Cart with id: 3 was not found"
