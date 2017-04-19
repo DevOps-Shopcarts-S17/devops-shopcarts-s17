@@ -51,6 +51,7 @@ def step_impl(context,sku,quantity,name,unitprice):
 	new_json = json.loads(context.resp.data)
 
 	if hasattr(context,'get_product'):
+		assert context.resp.status_code == 200
 		if new_json['sku'] == int(sku):
 			assert new_json['quantity'] == int(quantity)
 			assert new_json['name'] == name
@@ -106,6 +107,16 @@ def step_impl(context,sku):
 def step_impl(context,sku):
     context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products/'+sku)
     assert context.resp.status_code == 404
+
+@when(u'I get subtotal for the shopcart')
+def step_impl(context):
+	context.resp = context.app.put('/shopcarts/'+context.current_shopcart+'/subtotal')
+
+@then(u'I should see subtotal of "{subtotal}" in the shopcart')
+def step_impl(context, subtotal):
+    data = json.loads(context.resp.data)
+    assert context.resp.status_code == 200
+    assert data['subtotal'] == float(subtotal)
 
 @when(u'I load a new product without any details in the shopcart')
 def step_impl(context):
