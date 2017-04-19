@@ -57,11 +57,19 @@ def step_impl(context,sku,quantity,name,unitprice):
 			assert new_json['name'] == name
 			assert new_json['unitprice'] == float(unitprice)
 	else:
-		for i in range(0,len(new_json['products'])):
-			if new_json['products'][i]['sku'] == int(sku):
-				assert new_json['products'][i]['quantity'] == int(quantity)
-				assert new_json['products'][i]['name'] == name
-				assert new_json['products'][i]['unitprice'] == float(unitprice)
+		if hasattr(context,'get_products'):
+			assert context.resp.status_code == 200
+			for i in range(0,len(new_json)):
+				if new_json[i]['sku'] == int(sku):
+					assert new_json[i]['quantity'] == int(quantity)
+					assert new_json[i]['name'] == name
+					assert new_json[i]['unitprice'] == float(unitprice)
+		else:
+			for i in range(0,len(new_json['products'])):
+				if new_json['products'][i]['sku'] == int(sku):
+					assert new_json['products'][i]['quantity'] == int(quantity)
+					assert new_json['products'][i]['name'] == name
+					assert new_json['products'][i]['unitprice'] == float(unitprice)
 
 @then(u'I should not see a product with sku "{sku}"')
 def step_impl(context,sku):
@@ -81,10 +89,39 @@ def step_impl(context,id):
 	context.resp = context.app.get('/shopcarts/'+id)
 	context.get_shopcart = True
 
+@when(u'I fetch all the products of the shopcart')
+def step_impl(context):
+    context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products')
+    context.get_products = True
+
+@when(u'I query the shopcart with product name "{name}"')
+def step_impl(context,name):
+    context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products?name='+name)
+    context.get_product = True
+
 @when(u'I search for a product with sku "{sku}"')
 def step_impl(context,sku):
     context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products/'+sku)
     context.get_product = True
+
+@given(u'a product with name "{name}" does not exist')
+def step_impl(context,name):
+	context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products')
+	assert context.resp.status_code == 200
+	data = json.loads(context.resp.data)
+	for i in range(0,len(data)):
+		assert data[i]['name'] != name
+
+@given(u'a product with name "{name}" exists')
+def step_impl(context,name):
+	context.resp = context.app.get('/shopcarts/'+context.current_shopcart+'/products')
+	assert context.resp.status_code == 200
+	data = json.loads(context.resp.data)
+	found_product = False
+	for i in range(0,len(data)):
+		if data[i]['name'] == name:
+			found_product = True
+	assert found_product
 
 @given(u'a shopcart with uid "{id}" exists')
 def step_impl(context,id):

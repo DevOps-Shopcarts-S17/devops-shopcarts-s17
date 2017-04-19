@@ -82,6 +82,45 @@ Scenario: Get a particular product
   When I search for a product with sku "114672050"
   Then I should see "Shopping Cart with id: 13 was not found"
 
+Scenario: Get all the products of a shopcart
+  Given a shopcart with uid "1" exists
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 1     | 1     | 0.00     | 123456780   | 2                | Settlers of Catan | 27.99             |
+    | 1     | 1     | 0.00     | 876543210   | 1                | Risk              | 27.99             |
+  When I fetch all the products of the shopcart
+  Then I should see a product having sku "123456780", quantity "2", name "Settlers of Catan" and unitprice "27.99"
+  And I should see a product having sku "876543210", quantity "1", name "Risk" and unitprice "27.99"
+
+Scenario: Get all the products of a shopcart
+  Given a shopcart with uid "2" exists
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 2     | 2     | 0.00     |             |                  |                   |                   |
+  When I fetch all the products of the shopcart
+  Then I should see "The cart contains no products"
+
+Scenario: Get all the products of a shopcart
+  Given a shopcart with uid "22" does not exist
+  When I fetch all the products of the shopcart
+  Then I should see "Shopping Cart with id: 22 was not found"
+
+Scenario: Get all the products of a shopcart
+  Given a shopcart with uid "1" exists
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 1     | 1     | 0.00     | 123456780   | 2                | Settlers of Catan | 27.99             |
+    | 1     | 1     | 0.00     | 876543210   | 1                | Risk              | 27.99             |
+  And a product with name "Risk" exists
+  When I query the shopcart with product name "Risk"
+  Then I should see a product having sku "876543210", quantity "1", name "Risk" and unitprice "27.99"
+
+Scenario: Get all the products of a shopcart
+  Given a shopcart with uid "1" exists
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 1     | 1     | 0.00     | 123456780   | 2                | Settlers of Catan | 27.99             |
+    | 1     | 1     | 0.00     | 876543210   | 1                | Risk              | 27.99             |
+  And a product with name "Monopoly" does not exist
+  When I query the shopcart with product name "Monopoly"
+  Then I should see "Product with name: Monopoly was not found"
+
 Scenario: Get subtotal of a shopcart
   Given a shopcart with uid "1" exists
     | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
@@ -150,7 +189,7 @@ Scenario: Update a product
     Given a shopcart with uid "3" exists
     When I change a product with sku "114672050" to an empty product
     Then I should see "Product data is not valid"
-    
+
 Scenario: Delete a shopcart
     When I visit "shopcarts"
     Then I should see shopcart with id "1"
@@ -159,14 +198,14 @@ Scenario: Delete a shopcart
     When I delete "shopcarts" with id "3"
     And I search for a shopcart with sid "3"
     Then I should see "Shopping Cart with id: 3 was not found"
-    
+
 Scenario: Delete a product
     Given a shopcart with uid "1" exists
     When I search for a product with sku "876543210"
     Then I should see a product having sku "876543210", quantity "1", name "Risk" and unitprice "27.99"
     When I delete product with sku "876543210"
-    And I search for a product with sku "876543210" 
-    Then I should see "Product with sku: 876543210 was not found in the cart for user" 
+    And I search for a product with sku "876543210"
+    Then I should see "Product with sku: 876543210 was not found in the cart for user"
 
 Scenario: List all shopcarts under a particular user
     When I query "shopcarts" with query parameter uid "1"
