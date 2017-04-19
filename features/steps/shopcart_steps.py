@@ -193,12 +193,28 @@ def step_impl(context,sku):
 
 @when(u'I delete "{url}" with id "{id}"')
 def step_impl(context, url, id):
-  target_url = '/{}/{}'.format(url, id)
-  context.resp = context.app.delete(target_url)
-  assert context.resp.status_code == 204
-  assert context.resp.data is ""
+    target_url = '/{}/{}'.format(url, id)
+    context.resp = context.app.delete(target_url)
+    assert context.resp.status_code == 204
+    assert context.resp.data is ""
 
 @when(u'I delete product with sku "{sku}"')
 def step_impl(context, sku):
     context.resp = context.app.delete('/shopcarts/'+context.current_shopcart+'/products/'+sku)
     assert context.resp.status_code == 204
+
+@when(u'I query "{url}" with query parameter uid "{uid}"')
+def step_impl(context, url, uid):
+    target_url = '/{}?uid={}'.format(url, uid)
+    context.resp = context.app.get(target_url)
+    assert context.resp.status_code == 200
+
+@then(u'I should see shopcart with uid "{uid}"')
+def step_impl(context, uid):
+    data = json.loads(context.resp.data)
+    assert int(data['uid']) == int(uid)
+
+@then(u'I should not see shopcart with uid "{uid}"')
+def step_impl(context, uid):
+    data = json.loads(context.resp.data)
+    assert int(data['uid']) != int(uid)
