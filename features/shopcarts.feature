@@ -159,3 +159,11 @@ Scenario: Delete a shopcart
     When I delete "shopcarts" with id "3"
     And I search for a shopcart with sid "3"
     Then I should see "Shopping Cart with id: 3 was not found"
+
+Scenario: Delete a product
+    Given a shopcart with uid "1" exists
+    When I search for a product with sku "876543210"
+    Then I should see a product having sku "876543210", quantity "1", name "Risk" and unitprice "27.99"
+    When I delete product with sku "876543210"
+    And I search for a product with sku "876543210" 
+    Then I should see "Product with sku: 876543210 was not found in the cart for user" 
