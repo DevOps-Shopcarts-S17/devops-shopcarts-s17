@@ -146,3 +146,9 @@ Scenario: Delete a shopcart
     When I delete "shopcarts" with id "3"
     And I search for a shopcart with sid "3"
     Then I should see "Shopping Cart with id: 3 was not found"
+
+Scenario: List all shopcarts under a particular user
+    When I query "shopcarts" with query parameter uid "1"
+    Then I should see shopcart with uid "1"
+    And I should not see shopcart with uid "2"
+    And I should not see shopcart with uid "3"
