@@ -140,6 +140,15 @@ def step_impl(context,sku_original, sku_new, quantity, name, unitprice):
 	data = json.dumps(new_product)
 	url = '/shopcarts/'+context.current_shopcart+'/products/' + sku_original
 	context.resp = context.app.put(url, data=data, content_type='application/json')
+	assert context.resp.status_code == 200
+
+@when(u'I change a product with invalid sid or sku "{sku_original}" to sku "{sku_new}", quantity "{quantity}", name "{name}", and unitprice "{unitprice}"')
+def step_impl(context,sku_original, sku_new, quantity, name, unitprice):
+	new_product = { "products": [{"sku" : int(sku_new), "quantity" : int(quantity), "name" : name, "unitprice" : float(unitprice)}] }
+	data = json.dumps(new_product)
+	url = '/shopcarts/'+context.current_shopcart+'/products/' + sku_original
+	context.resp = context.app.put(url, data=data, content_type='application/json')
+	assert context.resp.status_code == 404
 
 @when(u'I change a product with sku "{sku}" to an empty product')
 def step_impl(context,sku):
@@ -147,3 +156,4 @@ def step_impl(context,sku):
 	data = json.dumps(new_product)
 	url = '/shopcarts/'+context.current_shopcart+'/products/' + sku
 	context.resp = context.app.put(url, data=data, content_type='application/json')
+	assert context.resp.status_code == 400

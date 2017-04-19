@@ -102,12 +102,12 @@ Scenario: Update a product
 
 Scenario: Update a product
     Given a shopcart with uid "54" does not exist
-    When I change a product with sku "123456780" to sku "123456781", quantity "3", name "Catan Expansion", and unitprice "22.99"
+    When I change a product with invalid sid or sku "123456780" to sku "123456781", quantity "3", name "Catan Expansion", and unitprice "22.99"
     Then I should see "Shopping Cart with id: 54 was not found"
 
 Scenario: Update a product
     Given a shopcart with uid "1" exists
-    When I change a product with sku "0" to sku "123456781", quantity "3", name "Catan Expansion", and unitprice "22.99"
+    When I change a product with invalid sid or sku "0" to sku "123456781", quantity "3", name "Catan Expansion", and unitprice "22.99"
     Then I should see "Product 0 was not found in shopping cart 1"
 
 Scenario: Update a product
