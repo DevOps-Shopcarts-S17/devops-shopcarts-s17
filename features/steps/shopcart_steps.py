@@ -187,3 +187,8 @@ def step_impl(context, url, id):
   context.resp = context.app.delete(target_url)
   assert context.resp.status_code == 204
   assert context.resp.data is ""
+
+@when(u'I delete product with sku "{sku}"')
+def step_impl(context, sku):
+    context.resp = context.app.delete('/shopcarts/'+context.current_shopcart+'/products/'+sku)
+    assert context.resp.status_code == 204
