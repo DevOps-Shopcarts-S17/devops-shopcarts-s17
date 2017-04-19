@@ -82,6 +82,19 @@ Scenario: Get a particular product
   When I search for a product with sku "114672050"
   Then I should see "Shopping Cart with id: 13 was not found"
 
+Scenario: Get subtotal of a shopcart
+  Given a shopcart with uid "1" exists
+    | uid   | sid   | subtotal | product sku | product quantity | product name      | product unitprice |
+    | 1     | 1     | 0.00     | 123456780   | 2                | Settlers of Catan | 27.99             |
+    | 1     | 1     | 0.00     | 876543210   | 1                | Risk              | 27.99             |
+  When I get subtotal for the shopcart
+  Then I should see subtotal of "83.97" in the shopcart
+
+Scenario: Get subtotal of a shopcart
+  Given a shopcart with uid "15" does not exist
+  When I get subtotal for the shopcart
+  Then I should see "Shopping Cart with id: 15 was not found"
+
 Scenario: Create a new product
   Given a shopcart with uid "2" exists
   When I load a new product with just sku "121987337", quantity "5", name "Carrom" in the shopcart
