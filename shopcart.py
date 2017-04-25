@@ -15,6 +15,8 @@
 import urllib
 import os
 import logging
+from redis import Redis
+from redis.exceptions import ConnectionError
 from threading import Lock
 from flask import Flask, Response, jsonify, request, make_response, json, url_for
 from flasgger import Swagger
@@ -48,6 +50,8 @@ HTTP_204_NO_CONTENT = 204
 HTTP_400_BAD_REQUEST = 400
 HTTP_404_NOT_FOUND = 404
 HTTP_409_CONFLICT = 409
+
+redis = None
 
 # Lock for thread-safe counter increment
 lock = Lock()
@@ -426,10 +430,52 @@ def setup_logging():
         app.logger.addHandler(handler)
 
 ######################################################################
+# Connect to Redis and catch connection exceptions
+######################################################################
+def connect_to_redis(hostname, port, password):
+    redis = Redis(host=hostname, port=port, password=password)
+    try:
+        redis.ping()
+    except ConnectionError:
+        redis = None
+    return redis
+
+######################################################################
+# INITIALIZE Redis
+# This method will work in the following conditions:
+#   1) In Bluemix with Redis bound through VCAP_SERVICES
+#   2) With Redis running on the local server as with Travis CI
+#   3) With Redis --link ed in a Docker container called 'redis'
+######################################################################
+def inititalize_redis():
+    global redis
+    redis = None
+    # Get the crdentials from the Bluemix environment
+    if 'VCAP_SERVICES' in os.environ:
+        app.logger.info("Using VCAP_SERVICES...")
+        VCAP_SERVICES = os.environ['VCAP_SERVICES']
+        services = json.loads(VCAP_SERVICES)
+        creds = services['rediscloud'][0]['credentials']
+        app.logger.info("Conecting to Redis on host %s port %s" % (creds['hostname'], creds['port']))
+        redis = connect_to_redis(creds['hostname'], creds['port'], creds['password'])
+    else:
+        app.logger.info("VCAP_SERVICES not found, checking localhost for Redis")
+        redis = connect_to_redis('127.0.0.1', 6379, None)
+        if not redis:
+            app.logger.info("No Redis on localhost, using: redis")
+            redis = connect_to_redis('redis', 6379, None)
+    if not redis:
+        # if you end up here, redis instance is down.
+        app.logger.error('*** FATAL ERROR: Could not connect to the Redis Service')
+        exit(1)
+
+######################################################################
 #   M A I N
 ######################################################################
 if __name__ == "__main__":
     # Pull options from environment
     debug = (os.getenv('DEBUG', 'False') == 'True')
     port = os.getenv('PORT', '8888')
+    print "Shopcart Service Starting..."
+    inititalize_redis()
     app.run(host='0.0.0.0', port=int(port), debug=debug)
