@@ -57,6 +57,20 @@ Vagrant.configure(2) do |config|
     echo "alias start_flask='flask run --host=0.0.0.0 --port=8888'" >> /home/vagrant/.bash_aliases
   SHELL
 
+  ######################################################################
+  # Add Redis docker container
+  ######################################################################
+  config.vm.provision "shell", inline: <<-SHELL
+    # Prepare Redis data share
+    sudo mkdir -p /var/lib/redis/data
+    sudo chown vagrant:vagrant /var/lib/redis/data
+  SHELL
 
+  # Add Redis docker container
+  config.vm.provision "docker" do |d|
+    d.pull_images "redis:alpine"
+    d.run "redis:alpine",
+      args: "--restart=always -d --name redis -h redis -p 6379:6379 -v /var/lib/redis/data:/data"
+  end
 
 end
