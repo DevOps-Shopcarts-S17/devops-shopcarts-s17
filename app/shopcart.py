@@ -61,46 +61,7 @@ lock = Lock()
 ######################################################################
 # Data Store, pre-populated with sample data
 ######################################################################
-shopping_carts = [
-    {
-        'uid':1,
-        'sid':  1,
-        'subtotal': 0.00,
-        'products': [
-            {
-                'sku': 123456780,
-                'quantity': 2,
-                'name': "Settlers of Catan",
-                'unitprice': 27.99
-            },
-            {
-                'sku': 876543210,
-                'quantity': 1,
-                'name': "Risk",
-                'unitprice': 27.99
-            }
-        ]
-    },
-    {
-        'uid':2,
-        'sid':  2,
-        'subtotal': 0.00,
-        'products': []
-    },
-    {
-        'uid': 3,
-        'sid': 3,
-        'subtotal': 0.00,
-        'products': [
-            {
-                'sku': 114672050,
-                'quantity': 1,
-                'name': "Game of Life",
-                'unitprice': 13.99
-            }
-        ]
-    }
-]
+shopping_carts = []
 
 current_shopping_cart_id = 3
 
@@ -131,7 +92,7 @@ def list_shopcarts():
             message={ 'error' : 'Data is not valid' }
             return make_response(jsonify(message), HTTP_400_BAD_REQUEST)
 
-        results=[cart for cart in shopping_carts if cart['uid']==int(uid)]
+        results=Shopcart.find_by_uid(uid)
         if len(results)!=0:
             results=results[0]
             rc=HTTP_200_OK
@@ -139,7 +100,7 @@ def list_shopcarts():
             results={ 'error' : 'Shopping Cart under user id: %s was not found' % str(uid) }
             rc=HTTP_404_NOT_FOUND
     else:
-        results=shopping_carts
+        results=Shopcart.all()
         rc=HTTP_200_OK
 
     return make_response(jsonify(results), rc)

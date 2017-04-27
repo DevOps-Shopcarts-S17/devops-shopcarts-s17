@@ -7,6 +7,7 @@ import json
 import logging
 from flask_api import status    # HTTP Status Codes
 from app import shopcart as server
+from app.models import Shopcart
 
 ######################################################################
 #  T E S T   C A S E S
@@ -15,10 +16,11 @@ class TestShopcartServer(unittest.TestCase):
 
     def setUp(self):
         # Only log criticl errors
+        server.inititalize_redis()
         server.app.debug = True
         server.app.logger.addHandler(logging.StreamHandler())
         server.app.logger.setLevel(logging.CRITICAL)
-        server.shopping_carts = [
+        shopping_carts = [
             {
                 'uid':1,
                 'sid':  1,
@@ -58,13 +60,11 @@ class TestShopcartServer(unittest.TestCase):
                 ]
             }
         ]
-        server.current_shopping_cart_id = 3
+        Shopcart.remove_all()
+        for s in shopping_carts:
+            shopcart = Shopcart()
+            shopcart.deserialize(s).save()
         self.app = server.app.test_client()
-
-    def tearDown(self):
-        server.shopping_carts = None
-        server.current_shopping_cart_id = 0
-        pass
 
     def test_index(self):
         resp = self.app.get('/')

@@ -51,6 +51,21 @@ class Shopcart(object):
         Shopcart.__redis = redis
 
     @staticmethod
+    def remove_all():
+        Shopcart.__redis.flushall()
+
+    @staticmethod
+    def all():
+        results = []
+        for key in Shopcart.__redis.keys():
+            if key != 'index':  # filer out our id index
+                print key
+                data = Shopcart.__redis.get(key)
+                data = pickle.loads(data)
+                results.append(data)
+        return results
+
+    @staticmethod
     def check_shopcart_exists(data):
         if Shopcart.__redis.exists(data['uid']):
             return True
@@ -84,3 +99,17 @@ class Shopcart(object):
         except TypeError as err:
             raise DataValidationError('Invalid Content Type error: ' + err)
         return valid
+
+    @staticmethod
+    def find_by_uid(uid):
+        # return [pet for pet in Pet.__data if pet.category == category]
+        results = []
+        results = []
+        for key in Shopcart.__redis.keys():
+            if key != 'index':  # filer out our id index
+                print key
+                data = Shopcart.__redis.get(key)
+                data = pickle.loads(data)
+                if data["uid"] == uid:
+                    results.append(data)
+        return results
