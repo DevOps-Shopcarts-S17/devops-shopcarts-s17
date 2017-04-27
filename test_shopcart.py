@@ -6,7 +6,7 @@ import unittest
 import json
 import logging
 from flask_api import status    # HTTP Status Codes
-import shopcart as server
+from app import shopcart as server
 
 ######################################################################
 #  T E S T   C A S E S

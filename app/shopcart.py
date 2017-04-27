@@ -20,9 +20,11 @@ from redis.exceptions import ConnectionError
 from threading import Lock
 from flask import Flask, Response, jsonify, request, make_response, json, url_for
 from flasgger import Swagger
+from models import Shopcart
+from . import app
+import error_handlers
 
 # Create Flask application
-app = Flask(__name__)
 app.config['LOGGING_LEVEL'] = logging.INFO
 
 # Swagger set up
@@ -220,43 +222,46 @@ def get_product(sid,sku):
 ######################################################################
 @app.route('/shopcarts', methods=['POST'])
 def create_shopcarts():
-    payload = request.get_json()
-    if is_valid_shopping_cart(payload):
-        id = next_sid()
-        shopping_cart_exists = False
-        valid_product = False
 
-        for i in range(0,len(shopping_carts)):
-            if shopping_carts[i]['uid'] == payload['uid']:
-                message = { 'error' : 'Shopping Cart for uid %s already exists' %str(payload['uid']) }
-                rc = HTTP_400_BAD_REQUEST
-                shopping_cart_exists = True
-                break
+    payload = request.get_json()
+    if Shopcart.validate_shopcart(payload):
+        valid_product = False
+        shopping_cart_exists = False
+
+        if Shopcart.check_shopcart_exists(payload):
+            message = { 'error' : 'Shopping Cart for uid %s already exists' %str(payload['uid']) }
+            rc = HTTP_400_BAD_REQUEST
+            shopping_cart_exists = True
 
         if shopping_cart_exists == False:
             if 'products' not in payload:
                 payload['products'] = [[]]
                 valid_product = True
             else:
-                if is_valid_product(payload):
+                if Shopcart.validate_product(payload):
                     valid_product = True
                 else:
                     message = { 'error' : 'Data is not valid' }
                     rc = HTTP_400_BAD_REQUEST
 
-            if valid_product == True:
-                shopcart = {'uid': payload['uid'],'sid': id, 'products': payload['products'], 'subtotal': 0.0}
-                shopping_carts.append(shopcart)
-                message = shopcart
-                rc = HTTP_201_CREATED
+            if 'subtotal' not in payload:
+                payload['subtotal'] = 0.0
 
+            if valid_product == True:
+                shopcart = Shopcart()
+                shopcart.deserialize(payload)
+                shopcart.save()
+                message = shopcart.serialize()
+                headerLocation = shopcart.self_url("shopcart")
+                rc = HTTP_201_CREATED
     else:
         message = { 'error' : 'Data is not valid' }
         rc = HTTP_400_BAD_REQUEST
 
+
     response = make_response(jsonify(message), rc)
     if rc == HTTP_201_CREATED:
-        response.headers['Location'] = url_for('get_shopcart', sid=id)
+        response.headers['Location'] = headerLocation
     return response
 
 ######################################################################
@@ -383,39 +388,6 @@ def subtotal_shopcart(sid):
 ######################################################################
 #  U T I L I T Y   F U N C T I O N S
 ######################################################################
-def next_sid():
-    global current_shopping_cart_id
-    with lock:
-        current_shopping_cart_id += 1
-    return current_shopping_cart_id
-
-def is_valid_product(data):
-    valid = False
-    try:
-        for i in range(0,len(data['products'])):
-            sku = data['products'][i]['sku']
-            quantity = data['products'][i]['quantity']
-            name = data['products'][i]['name']
-            unitprice = data['products'][i]['unitprice']
-        valid = True
-    except KeyError as err:
-        app.logger.warn('Missing parameter error: %s', err)
-    except TypeError as err:
-        app.logger.warn('Invalid Content Type error: %s', err)
-
-    return valid
-
-def is_valid_shopping_cart(data):
-    valid = False
-    try:
-        user_id = data['uid']
-        valid = True
-    except KeyError as err:
-        app.logger.warn('Missing parameter error: %s', err)
-    except TypeError as err:
-        app.logger.warn('Invalid Content Type error: %s', err)
-
-    return valid
 
 @app.before_first_request
 def setup_logging():
@@ -467,15 +439,4 @@ def inititalize_redis():
     if not redis:
         # if you end up here, redis instance is down.
         app.logger.error('*** FATAL ERROR: Could not connect to the Redis Service')
-        exit(1)
-
-######################################################################
-#   M A I N
-######################################################################
-if __name__ == "__main__":
-    # Pull options from environment
-    debug = (os.getenv('DEBUG', 'False') == 'True')
-    port = os.getenv('PORT', '8888')
-    print "Shopcart Service Starting..."
-    inititalize_redis()
-    app.run(host='0.0.0.0', port=int(port), debug=debug)
+    Shopcart.use_db(redis)
