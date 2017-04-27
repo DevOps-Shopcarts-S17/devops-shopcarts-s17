@@ -131,7 +131,7 @@ def list_shopcarts():
             message={ 'error' : 'Data is not valid' }
             return make_response(jsonify(message), HTTP_400_BAD_REQUEST)
 
-        results=[cart for cart in shopping_carts if cart['uid']==int(uid)]
+        results=Shopcart.find_by_uid(uid)
         if len(results)!=0:
             results=results[0]
             rc=HTTP_200_OK
@@ -139,7 +139,7 @@ def list_shopcarts():
             results={ 'error' : 'Shopping Cart under user id: %s was not found' % str(uid) }
             rc=HTTP_404_NOT_FOUND
     else:
-        results=shopping_carts
+        results=Shopcart.all()
         rc=HTTP_200_OK
 
     return make_response(jsonify(results), rc)
