@@ -326,16 +326,18 @@ def delete_products(sid,sku):
 ######################################################################
 @app.route('/shopcarts/<int:sid>/subtotal', methods=['PUT'])
 def subtotal_shopcart(sid):
-    for i in range(len(shopping_carts)):
-        if shopping_carts[i]['sid'] == sid:
-            subtotal = 0.0
 
-            for product in shopping_carts[i]['products']:
-                subtotal += product['unitprice'] * product['quantity']
-            shopping_carts[i]['subtotal'] = float("{0:.2f}".format(subtotal))
-            message = shopping_carts[i]
-            rc = HTTP_200_OK
-            break
+    cart = Shopcart.find(sid)
+
+    if cart:
+        subtotal = 0.0
+        for product in cart['products']:
+            subtotal += product['unitprice'] * product['quantity']
+        cart['subtotal'] = float("{0:.2f}".format(subtotal))
+        shopcart = Shopcart()
+        shopcart.deserialize(cart).save()
+        message = cart
+        rc = HTTP_200_OK
 
     if not 'rc' in locals():
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
