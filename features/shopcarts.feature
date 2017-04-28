@@ -3,6 +3,9 @@ Feature: The shopcart service back-end
     I need a RESTful shopcart service
     So that I can keep track of all my shopcarts
 
+Background:
+    Given the database loaded with dummy data
+
 Scenario: The server is running
     When I visit the "home page"
     Then I should see "Shopcart Demo REST API Service"
