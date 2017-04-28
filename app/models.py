@@ -119,12 +119,14 @@ class Shopcart(object):
                 unitprice = data['products'][i]['unitprice']
             valid = True
         except KeyError as err:
-            error = err.args[0]
-            if isinstance(err.args[0],int):
-                error = str(err.args[0])
-            raise DataValidationError('Missing parameter error: ' + error)
+            valid = False
+            #error = err.args[0]
+            #if isinstance(err.args[0],int):
+            #    error = str(err.args[0])
+            #raise DataValidationError('Missing parameter error: ' + error)
         except TypeError as err:
-            raise DataValidationError('Invalid product: body of request contained bad or no data')
+            valid = False
+            #raise DataValidationError('Invalid product: body of request contained bad or no data')
         return valid
 
     @staticmethod
