@@ -28,20 +28,30 @@ class Shopcart(object):
         return Shopcart.__redis.incr('index')
 
     def self_url(self,urltype):
-        if urltype == "shopcart":
-            return url_for('get_shopcart', sid=self.sid, _external=True)
-        elif urltype == "product":
-            return url_for('get_product', sid=self.sid, _external=True)
+        return url_for('get_shopcart', sid=self.sid, _external=True)
 
     def serialize(self):
         return { "uid": self.uid, "sid": self.sid, "subtotal": self.subtotal, "products": self.products }
+
+    def deserialize_products(self,data):
+        for i in range(0,len(data)):
+            if len(data) == 1:
+                if data[0] == []:
+                    data.remove(data[0])
+            self.products.append(data[i])
 
     def deserialize(self, data):
         if "sid" in data:
             self.sid = data['sid']
         self.uid = data['uid']
+        if 'sid' in data:
+            self.sid = data['sid']
         self.subtotal = data['subtotal']
         self.products = data['products']
+        if 'subtotal' not in data:
+            self.subtotal = 0.0
+        else:
+            self.subtotal = data['subtotal']
         return self
 
 ######################################################################
@@ -61,7 +71,6 @@ class Shopcart(object):
         results = []
         for key in Shopcart.__redis.keys():
             if key != 'index':  # filer out our id index
-                print key
                 data = Shopcart.__redis.get(key)
                 data = pickle.loads(data)
                 results.append(data)
@@ -77,11 +86,15 @@ class Shopcart(object):
             return None
 
     @staticmethod
-    def check_shopcart_exists(data):
-        if Shopcart.__redis.exists(data['uid']):
-            return True
+    def check_shopcart_exists(sid):
+        if Shopcart.__redis.exists(sid):
+            data = pickle.loads(Shopcart.__redis.get(sid))
+            shopcart = Shopcart(data['sid']).deserialize(data)
+            return shopcart
         else:
-            return False
+            return None
+
+
 
     @staticmethod
     def validate_shopcart(data):
@@ -92,7 +105,7 @@ class Shopcart(object):
         except KeyError as err:
             raise DataValidationError('Missing parameter error: ' + err.args[0])
         except TypeError as err:
-            raise DataValidationError('Invalid Content Type error: ' + err)
+            raise DataValidationError('Invalid shopcart: body of request contained bad or no data')
         return valid
 
     @staticmethod
@@ -106,18 +119,19 @@ class Shopcart(object):
                 unitprice = data['products'][i]['unitprice']
             valid = True
         except KeyError as err:
-            raise DataValidationError('Missing parameter error: ' + err.args[0])
+            error = err.args[0]
+            if isinstance(err.args[0],int):
+                error = str(err.args[0])
+            raise DataValidationError('Missing parameter error: ' + error)
         except TypeError as err:
-            raise DataValidationError('Invalid Content Type error: ' + err)
+            raise DataValidationError('Invalid product: body of request contained bad or no data')
         return valid
 
     @staticmethod
     def find_by_uid(uid):
-        # return [pet for pet in Pet.__data if pet.category == category]
         results = []
         for key in Shopcart.__redis.keys():
             if key != 'index':  # filer out our id index
-                print key
                 data = Shopcart.__redis.get(key)
                 data = pickle.loads(data)
                 if data["uid"] == uid:
