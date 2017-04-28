@@ -41,6 +41,8 @@ class Shopcart(object):
             self.products.append(data[i])
 
     def deserialize(self, data):
+        if "sid" in data:
+            self.sid = data['sid']
         self.uid = data['uid']
         if 'sid' in data:
             self.sid = data['sid']
@@ -75,11 +77,14 @@ class Shopcart(object):
         return results
 
     @staticmethod
-    def check_shopcart_exists(sid):
+
+    def find(sid):
         if Shopcart.__redis.exists(sid):
-            data = pickle.loads(Shopcart.__redis.get(sid))
-            shopcart = Shopcart(data['sid']).deserialize(data)
-            return shopcart
+            data = Shopcart.__redis.get(sid)
+            data = pickle.loads(data)
+            return data
+        else:
+            return None
 
     @staticmethod
     def validate_shopcart(data):

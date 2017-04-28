@@ -111,9 +111,9 @@ def list_shopcarts():
 # USAGE: /shopcarts/3
 @app.route('/shopcarts/<int:sid>', methods=['GET'])
 def get_shopcart(sid):
-    carts = [cart for cart in shopping_carts if cart['sid']==sid]
-    if len(carts) > 0:
-        message = carts[0]
+    cart = Shopcart.find(sid)
+    if cart:
+        message = cart
         rc = HTTP_200_OK
     else:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
@@ -127,10 +127,10 @@ def get_shopcart(sid):
 # USAGE: /shopcarts/3/products or /shopcarts/3/products?name=Settlers of Catan for querying for a product
 @app.route('/shopcarts/<int:sid>/products', methods=['GET'])
 def get_products(sid):
-    carts = [cart for cart in shopping_carts if cart['sid']==sid]
+    cart = Shopcart.find(sid)
     name = request.args.get('name')
-    if len(carts) > 0:
-        products = carts[0]['products']
+    if cart:
+        products = cart['products']
         if(len(products)==0):
             if name:
                 message={ 'error' : 'Product with name: %s was not found' % urllib.unquote(name) }
@@ -165,12 +165,12 @@ def get_products(sid):
 # USAGE: /shopcarts/3/products/114672050
 @app.route('/shopcarts/<int:sid>/products/<int:sku>', methods=['GET'])
 def get_product(sid,sku):
-    carts = [cart for cart in shopping_carts if cart['sid']==sid]
-    if(len(carts)==0):
+    cart = Shopcart.find(sid)
+    if not cart:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
         return make_response(jsonify(message),HTTP_404_NOT_FOUND)
     else:
-        products=[product for product in carts[0]['products'] if product['sku']==sku]
+        products=[product for product in cart['products'] if product['sku']==sku]
         if(len(products)==0):
             message = { 'error' : 'Product with sku: %s was not found in the cart for user %s' % (str(sku), str(sid))}
             return make_response(jsonify(message),HTTP_404_NOT_FOUND)
@@ -233,7 +233,7 @@ def create_shopcarts():
 @app.route('/shopcarts/<int:sid>/products', methods=['POST'])
 def create_products(sid):
 
-    existing_shopcart = Shopcart.check_shopcart_exists(sid)
+    existing_shopcart = Shopcart.find(sid)
 
     if existing_shopcart:
         payload = request.get_json()
@@ -309,12 +309,14 @@ def delete_shopcarts(sid):
 ######################################################################
 @app.route('/shopcarts/<int:sid>/products/<int:sku>', methods=['DELETE'])
 def delete_products(sid,sku):
-    for i in range(len(shopping_carts)):
-    	if shopping_carts[i]['sid'] == sid:
-    	    for j in range(len(shopping_carts[i]['products'])):
-    	    	if shopping_carts[i]['products'][j]['sku'] == sku:
-    	    		del shopping_carts[i]['products'][j]
-    	    		break
+    cart = Shopcart.find(sid)
+    if cart:
+        for j in range(len(cart['products'])):
+            if cart['products'][j]['sku'] == sku:
+                del cart['products'][j]
+                break
+        s = Shopcart()
+        s.deserialize(cart).save()
     return '', HTTP_204_NO_CONTENT
 
 ######################################################################
