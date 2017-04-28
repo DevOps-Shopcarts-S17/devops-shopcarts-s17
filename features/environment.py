@@ -1,9 +1,10 @@
 from behave import *
-import shopcart as server
+from app import shopcart as server
+from app.models import Shopcart
 
 def before_all(context):
     context.app = server.app.test_client()
-    server.shopping_carts = [
+    shopping_carts = [
         {
             'uid':1,
             'sid':  1,
@@ -43,5 +44,9 @@ def before_all(context):
             ]
         }
     ]
-    server.current_shopping_cart_id = 3
+    server.inititalize_redis()
+    Shopcart.remove_all()
+    for s in shopping_carts:
+        shopcart = Shopcart()
+        shopcart.deserialize(s).save()
     context.server = server
