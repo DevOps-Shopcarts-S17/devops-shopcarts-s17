@@ -213,7 +213,7 @@ def create_shopcarts():
             if valid_product == True:
                 shopcart = Shopcart()
                 shopcart.deserialize(payload)
-                shopcart.save("shopcart")
+                shopcart.save()
                 message = shopcart.serialize()
                 headerLocation = shopcart.self_url("shopcart")
                 rc = HTTP_201_CREATED
@@ -239,7 +239,7 @@ def create_products(sid):
         payload = request.get_json()
         if Shopcart.validate_product(payload):
             existing_shopcart.deserialize_products(payload['products'])
-            existing_shopcart.save("product")
+            existing_shopcart.save()
             message = existing_shopcart.serialize()
             headerLocation = existing_shopcart.self_url("product")
             rc = HTTP_201_CREATED

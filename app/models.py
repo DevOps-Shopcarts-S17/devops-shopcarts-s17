@@ -19,10 +19,9 @@ class Shopcart(object):
         self.subtotal = float(subtotal)
         self.products = products
 
-    def save(self,type):
-        if type == "shopcart":
-            if self.sid == 0:
-                self.sid = self.__next_index()
+    def save(self):
+        if self.sid == 0:
+            self.sid = self.__next_index()
         Shopcart.__redis.set(self.sid, pickle.dumps(self.serialize()))
 
     def __next_index(self):
