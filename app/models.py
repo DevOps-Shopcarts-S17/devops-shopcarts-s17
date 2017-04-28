@@ -37,6 +37,8 @@ class Shopcart(object):
         return { "uid": self.uid, "sid": self.sid, "subtotal": self.subtotal, "products": self.products }
 
     def deserialize(self, data):
+        if "sid" in data:
+            self.sid = data['sid']
         self.uid = data['uid']
         self.subtotal = data['subtotal']
         self.products = data['products']
@@ -64,6 +66,15 @@ class Shopcart(object):
                 data = pickle.loads(data)
                 results.append(data)
         return results
+
+    @staticmethod
+    def find(sid):
+        if Shopcart.__redis.exists(sid):
+            data = Shopcart.__redis.get(sid)
+            data = pickle.loads(data)
+            return data
+        else:
+            return None
 
     @staticmethod
     def check_shopcart_exists(data):
@@ -103,7 +114,6 @@ class Shopcart(object):
     @staticmethod
     def find_by_uid(uid):
         # return [pet for pet in Pet.__data if pet.category == category]
-        results = []
         results = []
         for key in Shopcart.__redis.keys():
             if key != 'index':  # filer out our id index
