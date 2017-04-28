@@ -233,7 +233,7 @@ def create_shopcarts():
 @app.route('/shopcarts/<int:sid>/products', methods=['POST'])
 def create_products(sid):
 
-    existing_shopcart = Shopcart.find(sid)
+    existing_shopcart = Shopcart.check_shopcart_exists(sid)
 
     if existing_shopcart:
         payload = request.get_json()

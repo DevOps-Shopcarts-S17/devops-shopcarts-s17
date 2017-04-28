@@ -77,7 +77,6 @@ class Shopcart(object):
         return results
 
     @staticmethod
-
     def find(sid):
         if Shopcart.__redis.exists(sid):
             data = Shopcart.__redis.get(sid)
@@ -85,6 +84,17 @@ class Shopcart(object):
             return data
         else:
             return None
+
+    @staticmethod
+    def check_shopcart_exists(sid):
+        if Shopcart.__redis.exists(sid):
+            data = pickle.loads(Shopcart.__redis.get(sid))
+            shopcart = Shopcart(data['sid']).deserialize(data)
+            return shopcart
+        else:
+            return None
+
+
 
     @staticmethod
     def validate_shopcart(data):
@@ -95,7 +105,7 @@ class Shopcart(object):
         except KeyError as err:
             raise DataValidationError('Missing parameter error: ' + err.args[0])
         except TypeError as err:
-            raise DataValidationError('Invalid Content Type error: ' + err)
+            raise DataValidationError('Invalid shopcart: body of request contained bad or no data')
         return valid
 
     @staticmethod
@@ -109,9 +119,12 @@ class Shopcart(object):
                 unitprice = data['products'][i]['unitprice']
             valid = True
         except KeyError as err:
-            raise DataValidationError('Missing parameter error: ' + err.args[0])
+            error = err.args[0]
+            if isinstance(err.args[0],int):
+                error = str(err.args[0])
+            raise DataValidationError('Missing parameter error: ' + error)
         except TypeError as err:
-            raise DataValidationError('Invalid Content Type error: ' + err)
+            raise DataValidationError('Invalid product: body of request contained bad or no data')
         return valid
 
     @staticmethod
