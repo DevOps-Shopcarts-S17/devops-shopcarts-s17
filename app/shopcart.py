@@ -189,7 +189,9 @@ def create_shopcarts():
         valid_product = False
         shopping_cart_exists = False
 
-        if Shopcart.check_shopcart_exists(payload):
+        shopcart_found = Shopcart.find_by_uid(payload['uid'])
+
+        if len(shopcart_found) > 0:
             message = { 'error' : 'Shopping Cart for uid %s already exists' %str(payload['uid']) }
             rc = HTTP_400_BAD_REQUEST
             shopping_cart_exists = True
@@ -230,37 +232,27 @@ def create_shopcarts():
 ######################################################################
 @app.route('/shopcarts/<int:sid>/products', methods=['POST'])
 def create_products(sid):
-    cart = Shopcart.find(sid)
-    if cart:
+
+    existing_shopcart = Shopcart.check_shopcart_exists(sid)
+
+    if existing_shopcart:
         payload = request.get_json()
         if Shopcart.validate_product(payload):
-            for i in range(0,len(payload['products'])):
-                product = {'sku': payload['products'][i]['sku'],'quantity': payload['products'][i]['quantity'], 'name': payload['products'][i]['name'], 'unitprice' : payload['products'][i]['unitprice']}
-                if len(cart['products']) == 1:
-                    if cart['products'][0] == []:
-                        cart['products'].remove(cart['products'][0])
-                    cart['products'].append(product)
-                else:
-                    cart['products'].append(product)
-            s = Shopcart()
-            s.deserialize(cart).save()
-            message = cart
+            existing_shopcart.deserialize_products(payload['products'])
+            existing_shopcart.save()
+            message = existing_shopcart.serialize()
+            headerLocation = existing_shopcart.self_url("product")
             rc = HTTP_201_CREATED
         else:
             message = { 'error' : 'Data is not valid' }
             rc = HTTP_400_BAD_REQUEST
 
         response = make_response(jsonify(message), rc)
-
-        if rc == HTTP_201_CREATED:
-            response.headers['Location'] = url_for('get_product', sku = product['sku'], sid=cart['sid'])
         return response
-
     else:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
         rc = HTTP_404_NOT_FOUND
         return make_response(jsonify(message), rc)
-
 
 ######################################################################
 # UPDATE product in a shopping cart

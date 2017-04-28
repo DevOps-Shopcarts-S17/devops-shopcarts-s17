@@ -23,7 +23,6 @@ class TestShopcartServer(unittest.TestCase):
         shopping_carts = [
             {
                 'uid':1,
-                'sid':  1,
                 'subtotal': 0.00,
                 'products': [
                     {
@@ -42,13 +41,11 @@ class TestShopcartServer(unittest.TestCase):
             },
             {
                 'uid':2,
-                'sid':  2,
                 'subtotal': 0.00,
                 'products': []
             },
             {
                 'uid': 3,
-                'sid': 3,
                 'subtotal': 0.00,
                 'products': [
                     {
@@ -178,7 +175,6 @@ class TestShopcartServer(unittest.TestCase):
         self.assertEqual( resp.status_code, status.HTTP_200_OK )
         data = json.loads(resp.data)
         self.assertEqual( data['subtotal'], 13.99)
-
 
     def test_create_shopcart_without_products(self):
         # save the current number of shopcarts for later comparrison
@@ -536,7 +532,6 @@ class TestShopcartServer(unittest.TestCase):
         resp = self.app.put('/shopcarts/1/products/123456780', data=data, content_type='application/json')
         self.assertTrue( len(resp.data) > 0)
         self.assertTrue("Product data is not valid" in resp.data)
-
 
 ######################################################################
 # Utility functions
