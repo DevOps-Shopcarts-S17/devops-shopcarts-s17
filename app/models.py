@@ -106,9 +106,11 @@ class Shopcart(object):
                 unitprice = data['products'][i]['unitprice']
             valid = True
         except KeyError as err:
-            raise DataValidationError('Missing parameter error: ' + err.args[0])
+            valid = False
+            #raise DataValidationError('Missing parameter error: ' + err.args[0])
         except TypeError as err:
-            raise DataValidationError('Invalid Content Type error: ' + err)
+            valid = False
+            #raise DataValidationError('Invalid Content Type error: ' + err)
         return valid
 
     @staticmethod

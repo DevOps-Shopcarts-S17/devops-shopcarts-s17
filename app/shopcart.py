@@ -230,20 +230,21 @@ def create_shopcarts():
 ######################################################################
 @app.route('/shopcarts/<int:sid>/products', methods=['POST'])
 def create_products(sid):
-    cart = [cart for cart in shopping_carts if cart['sid']==sid]
-    if len(cart) > 0:
+    cart = Shopcart.find(sid)
+    if cart:
         payload = request.get_json()
-        if is_valid_product(payload):
+        if Shopcart.validate_product(payload):
             for i in range(0,len(payload['products'])):
                 product = {'sku': payload['products'][i]['sku'],'quantity': payload['products'][i]['quantity'], 'name': payload['products'][i]['name'], 'unitprice' : payload['products'][i]['unitprice']}
-                if len(cart[0]['products']) == 1:
-                    if cart[0]['products'][0] == []:
-                        cart[0]['products'].remove(cart[0]['products'][0])
-                    cart[0]['products'].append(product)
+                if len(cart['products']) == 1:
+                    if cart['products'][0] == []:
+                        cart['products'].remove(cart['products'][0])
+                    cart['products'].append(product)
                 else:
-                    cart[0]['products'].append(product)
-
-            message = cart[0]
+                    cart['products'].append(product)
+            s = Shopcart()
+            s.deserialize(cart).save()
+            message = cart
             rc = HTTP_201_CREATED
         else:
             message = { 'error' : 'Data is not valid' }
@@ -252,7 +253,7 @@ def create_products(sid):
         response = make_response(jsonify(message), rc)
 
         if rc == HTTP_201_CREATED:
-            response.headers['Location'] = url_for('get_product', sku = product['sku'], sid=cart[0]['sid'])
+            response.headers['Location'] = url_for('get_product', sku = product['sku'], sid=cart['sid'])
         return response
 
     else:
@@ -266,23 +267,25 @@ def create_products(sid):
 ######################################################################
 @app.route('/shopcarts/<int:sid>/products/<int:sku>', methods=['PUT'])
 def put_product(sid, sku):
-    cart = [cart for cart in shopping_carts if cart['sid'] == sid]
-    if len(cart) > 0:
+    cart = Shopcart.find(sid)
+    if cart:
         payload = request.get_json()
         products = payload['products']
-        if is_valid_product(payload) and len(products) == 1:
+        if Shopcart.validate_product(payload) and len(products) == 1:
             updated_product = {'sku': products[0]['sku'], 'quantity': products[0]['quantity'], 'name': products[0]['name'], 'unitprice': products[0]['unitprice']}
 
             found_product = False
-            for i in range(len(cart[0]['products'])):
-                product = cart[0]['products'][i]
+            for i in range(len(cart['products'])):
+                product = cart['products'][i]
                 if product['sku'] == sku:
-                    cart[0]['products'][i] = updated_product
+                    cart['products'][i] = updated_product
                     found_product = True
                     break
-
+                
             if found_product:
-                message = cart[0]
+                s = Shopcart()
+                s.deserialize(cart).save()
+                message = cart
                 rc = HTTP_200_OK
             else:
                 message = { 'error' : 'Product %s was not found in shopping cart %s' % (str(sku), str(sid)) }
