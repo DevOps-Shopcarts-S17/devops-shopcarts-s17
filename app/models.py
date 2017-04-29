@@ -106,9 +106,11 @@ class Shopcart(object):
             user_id = data['uid']
             valid = True
         except KeyError as err:
-            raise DataValidationError('Missing parameter error: ' + err.args[0])
+            valid = False
+            #raise DataValidationError('Missing parameter error: ' + err.args[0])
         except TypeError as err:
-            raise DataValidationError('Invalid shopcart: body of request contained bad or no data')
+            valid = False
+            #raise DataValidationError('Invalid shopcart: body of request contained bad or no data')
         return valid
 
     @staticmethod
