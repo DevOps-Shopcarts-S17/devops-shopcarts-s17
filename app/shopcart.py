@@ -300,11 +300,12 @@ def put_product(sid, sku):
 ######################################################################
 @app.route('/shopcarts/<int:sid>', methods=['DELETE'])
 def delete_shopcarts(sid):
-    for i in range(len(shopping_carts)):
-    	if shopping_carts[i]['sid'] == sid:
-    	    del shopping_carts[i]
-    	    break
-    return '', HTTP_204_NO_CONTENT
+    cart = Shopcart.find(sid)
+    if cart:
+        s = Shopcart()
+        s.deserialize(cart).save()
+        s.delete()
+    return make_response('', HTTP_204_NO_CONTENT)
 
 ######################################################################
 # DELETE A PRODUCT FROM A SHOPPING CART
