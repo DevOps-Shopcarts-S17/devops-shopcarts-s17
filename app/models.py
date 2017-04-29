@@ -24,6 +24,9 @@ class Shopcart(object):
             self.sid = self.__next_index()
         Shopcart.__redis.set(self.sid, pickle.dumps(self.serialize()))
 
+    def delete(self):
+        Shopcart.__redis.delete(self.sid)
+
     def __next_index(self):
         return Shopcart.__redis.incr('index')
 
