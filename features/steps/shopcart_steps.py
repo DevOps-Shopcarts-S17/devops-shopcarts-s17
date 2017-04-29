@@ -1,6 +1,6 @@
 from behave import *
 import json
-import shopcart as server
+from app import shopcart as server
 from app.models import Shopcart
 
 # Status Codes
