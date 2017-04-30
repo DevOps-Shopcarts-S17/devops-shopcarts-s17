@@ -127,6 +127,48 @@ def get_shopcart(sid):
 # USAGE: /shopcarts/3/products or /shopcarts/3/products?name=Settlers of Catan for querying for a product
 @app.route('/shopcarts/<int:sid>/products', methods=['GET'])
 def get_products(sid):
+
+    """
+    Retrieve a list of products of a particular shopcart
+    This endpoint will return all products of a shopcart unless a query parameter is specificed
+    ---
+    tags:
+      - Shopcarts
+    description: The Products endpoint allows you to query products
+    parameters:
+      - name: sid
+        in: path
+        description: the sid of the shopcart you are looking for
+        required: true
+        type: integer
+      - name: name
+        in: query
+        description: the name of the product you are looking for
+        required: false
+        type: string
+    responses:
+      200:
+        description: An array of Products
+        schema:
+          type: array
+          items:
+            schema:
+              id: Product
+              properties:
+                sku:
+                  type: integer
+                  description: unique id of the particular product
+                name:
+                  type: string
+                  description: name of the particular product
+                quantity:
+                  type: integer
+                  description: quantity of the particular product
+                unitprice:
+                   type: number
+                   description: price of the particular product
+    """
+
     cart = Shopcart.find(sid)
     name = request.args.get('name')
     if cart:
