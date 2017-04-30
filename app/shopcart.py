@@ -71,9 +71,11 @@ current_shopping_cart_id = 3
 @app.route('/')
 def index():
     shopcarts_url = request.base_url + 'shopcarts'
+    docs_url = request.base_url + 'apidocs/index.html'
     return make_response(jsonify(name='Shopcart Demo REST API Service v1.0',
                    version='1.0',
-                   url=shopcarts_url
+                   url=shopcarts_url,
+                   docs=docs_url
                    ), HTTP_200_OK)
 
 ######################################################################
@@ -82,6 +84,7 @@ def index():
 # USAGE: /shopcarts or /shopcarts?uid=1 for quering for a user
 @app.route('/shopcarts', methods=['GET'])
 def list_shopcarts():
+
     '''
     Retrieve a list of shopcarts
     This endpoint will return all Shopcarts unless a query parameter is specificed
@@ -104,34 +107,34 @@ def list_shopcarts():
             schema:
               id: Shopcart
               properties:
-                uid:
-                    type: integer
-                    description: unique id of the user of the shopcart
-                sid:
-                    type: integer
-                    description: unique id assigned internally by service
-                subtotal:
-                    type: number
-                    description: subtotal of all the products in the shopcart
-                products:
-                    schema:
-                        type: array
-                        items:
+                    uid:
+                        type: integer
+                        description: unique id of the user of the shopcart
+                    sid:
+                        type: integer
+                        description: unique id assigned internally by service
+                    subtotal:
+                        type: number
+                        description: subtotal of all the products in the shopcart
+                    products:
                         schema:
-                            id: Product
-                            properties:
-                                sku:
-                                    type: integer
-                                    description: unique id of the particular product
-                                name:
-                                    type: string
-                                    description: name of the particular product
-                                quantity:
-                                    type: integer
-                                    description: quantity of the particular product
-                                unitprice:
-                                    type: number
-                                    description: price of the particular product
+                          type: array
+                          items:
+                            schema:
+                                id: Product
+                                properties:
+                                    sku:
+                                        type: integer
+                                        description: unique id of the particular product
+                                    name:
+                                        type: string
+                                        description: name of the particular product
+                                    quantity:
+                                        type: integer
+                                        description: quantity of the particular product
+                                    unitprice:
+                                        type: number
+                                        description: price of the particular product
 
     '''
     results=[]
