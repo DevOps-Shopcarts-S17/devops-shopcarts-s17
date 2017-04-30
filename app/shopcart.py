@@ -82,6 +82,58 @@ def index():
 # USAGE: /shopcarts or /shopcarts?uid=1 for quering for a user
 @app.route('/shopcarts', methods=['GET'])
 def list_shopcarts():
+    '''
+    Retrieve a list of shopcarts
+    This endpoint will return all Shopcarts unless a query parameter is specificed
+    ---
+    tags:
+      - Shopcarts
+    description: The Shopcarts endpoint allows you to query Shopcarts
+    parameters:
+      - name: uid
+        in: query
+        description: the uid of Shopcart you are looking for
+        required: false
+        type: string
+    responses:
+      200:
+        description: An array of Shopcarts
+        schema:
+          type: array
+          items:
+            schema:
+              id: Shopcart
+              properties:
+                uid:
+                    type: integer
+                    description: unique id of the user of the shopcart
+                sid:
+                    type: integer
+                    description: unique id assigned internally by service
+                subtotal:
+                    type: number
+                    description: subtotal of all the products in the shopcart
+                products:
+                    schema:
+                        type: array
+                        items:
+                        schema:
+                            id: Product
+                            properties:
+                                sku:
+                                    type: integer
+                                    description: unique id of the particular product
+                                name:
+                                    type: string
+                                    description: name of the particular product
+                                quantity:
+                                    type: integer
+                                    description: quantity of the particular product
+                                unitprice:
+                                    type: number
+                                    description: price of the particular product
+
+    '''
     results=[]
     uid=request.args.get('uid')
     if uid:
