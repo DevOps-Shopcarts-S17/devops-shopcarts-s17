@@ -6,6 +6,7 @@ install: "sudo pip install -r requirements.txt"
 
 script:
   - nosetests --with-coverage --cover-erase
+  - behave
 
 after_success:
   - codecov
