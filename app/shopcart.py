@@ -751,7 +751,7 @@ def subtotal_shopcart(sid):
         type: integer
         required: true
     responses:
-      204:
+      200:
         description: Subtotal calculated
     """
 
