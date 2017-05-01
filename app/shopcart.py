@@ -317,6 +317,50 @@ def get_products(sid):
 # USAGE: /shopcarts/3/products/114672050
 @app.route('/shopcarts/<int:sid>/products/<int:sku>', methods=['GET'])
 def get_product(sid,sku):
+
+    """
+    Retrieve a single product
+    This endpoint will return a product based on it's sku
+    ---
+    tags:
+      - Shopcarts
+    produces:
+      - application/json
+    parameters:
+      - name: sid
+        in: path
+        description: sid of the shopcart to retrieve
+        type: integer
+        required: true
+      - name: sku
+        in: path
+        description: sku of the product to retrieve
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Product returned
+        schema:
+          id: Product
+          properties:
+              sku:
+                type: integer
+                description: unique id of the particular product
+              name:
+                type: string
+                description: name of the particular product
+              quantity:
+                type: integer
+                description: quantity of the particular product
+              unitprice:
+                type: number
+                description: price of the particular product
+
+      404:
+        description: Product not found
+    """
+
+
     cart = Shopcart.find(sid)
     if not cart:
         message = { 'error' : 'Shopping Cart with id: %s was not found' % str(sid) }
