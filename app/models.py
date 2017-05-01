@@ -38,9 +38,9 @@ class Shopcart(object):
 
     def deserialize_products(self,data):
         for i in range(0,len(data)):
-            if len(data) == 1:
-                if data[0] == []:
-                    data.remove(data[0])
+            if len(self.products) == 1:
+                if self.products[0] == []:
+                    self.products.remove(self.products[0])
             self.products.append(data[i])
 
     def deserialize(self, data):
