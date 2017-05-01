@@ -492,41 +492,52 @@ def create_products(sid):
         schema:
           id: data
           required:
-            - sku
-            - name
-            - quantity
-            - unitprice
+            - products
           properties:
-            sku:
-                type: integer
-                description: unique id of the particular product
-            name:
-                type: string
-                description: name of the particular product
-            quantity:
-                type: integer
-                description: quantity of the particular product
-            unitprice:
-                type: number
-                description: price of the particular product
+            products:
+              schema:
+                type: array
+                items:
+                  schema:
+                      id: Product
+                      properties:
+                          sku:
+                            type: integer
+                            description: unique id of the particular product
+                          name:
+                            type: string
+                            description: name of the particular product
+                          quantity:
+                            type: integer
+                            description: quantity of the particular product
+                          unitprice:
+                            type: number
+                            description: price of the particular product
     responses:
       201:
         description: Product created
         schema:
           id: Product
           properties:
-            sku:
-                type: integer
-                description: unique id of the particular product
-            name:
-                type: string
-                description: name of the particular product
-            quantity:
-                type: integer
-                description: quantity of the particular product
-            unitprice:
-                type: number
-                description: price of the particular product
+            products:
+              schema:
+                type: array
+                items:
+                  schema:
+                      id: Product
+                      properties:
+                          sku:
+                            type: integer
+                            description: unique id of the particular product
+                          name:
+                            type: string
+                            description: name of the particular product
+                          quantity:
+                            type: integer
+                            description: quantity of the particular product
+                          unitprice:
+                            type: number
+                            description: price of the particular product
       400:
         description: Bad Request (the posted data was not valid)
     """
