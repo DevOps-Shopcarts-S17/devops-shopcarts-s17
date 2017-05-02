@@ -4,7 +4,7 @@ from app import shopcart as server
 
 # Pull options from environment
 debug = (os.getenv('DEBUG', 'False') == 'True')
-port = os.getenv('PORT', '5000')
+port = os.getenv('PORT', '8888')
 
 ######################################################################
 #   M A I N
